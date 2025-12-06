@@ -291,6 +291,10 @@ header .register-button {
   box-shadow: #e5e5e5;
   width: 270px;
   height: auto;
+  transition: transform 0.3s ease ;
+}
+.book-card:hover{
+  transform: scale(1.1);
 }
 
 .book-card .book-cover {
