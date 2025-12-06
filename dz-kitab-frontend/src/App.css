@@ -2,6 +2,9 @@
 
 body {
   margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .layout {
@@ -14,9 +17,11 @@ header {
   align-items: center;
   padding: 20px 50px;
 }
+
 header span {
   color: #F3A109;
 }
+
 header .buttons {
   display: flex;
   gap: 10px;
@@ -32,7 +37,19 @@ header a {
   color: black;
   cursor: pointer;
 }
-header a:hover{
+header .a {
+  color: black;
+  cursor: pointer;
+}
+header .a:hover {
+  color: black;
+  cursor: pointer;
+}
+header a:hover {
+  color: #1314D7;
+  font-weight: 600;
+}
+header a:active{
   color: #1314D7;
   font-weight: 600;
 }
@@ -65,6 +82,74 @@ header .register-button {
   transition: transform 0.3s ease;
 }
 
+.hero {
+  background: linear-gradient(to bottom, #E3E3FD, #E2DAD8);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 50px 0 50px;
+  position: relative;
+  margin:0;
+}
+
+.hero h3 {
+  width: 400px;
+  font-size: 30px;
+}
+
+.hero .p {
+  color: #2C2B2B;
+  width: 500px;
+}
+
+.hero span {
+  color: #F3A109;
+}
+
+.heroinfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.hero .search {
+  position: relative;
+  width: 450px;
+  height: 40px;
+  border-radius: 10px;
+  background-color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hero input {
+  border: none;
+  margin-left: 10px;
+  outline: none;
+  width: 350px;
+}
+
+.hero .search-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 100px;
+  height: 40px;
+  color: white;
+  background-color: #1314D7;
+  border: #1314D7 solid;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.heropicture {
+  width: 400px;
+  height: 400px;
+}
+
 .login-button:hover {
   transform: scale(1.2);
 }
@@ -73,16 +158,7 @@ header .register-button {
   transform: scale(1.2);
 }
 
-.button {
-  /* border-radius: 15px; */
-  border-style: solid;
-}
-
 footer {
-  position: fixed;
-  bottom: 0;
-  right: 0;
-  left: 0;
   display: flex;
   flex-direction: column;
   gap: 10;
@@ -98,7 +174,8 @@ footer span {
 
 .footer-content {
   display: flex;
-  gap: 180px;
+  justify-content: space-between;
+  /* gap: 180px; */
 }
 
 footer h3 {
