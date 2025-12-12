@@ -297,7 +297,7 @@ header .register-button {
   flex-direction: column;
   padding: 20px;
   background-color: white;
-  border-radius: 20px;
+  border-radius: 5px;
   box-shadow: 0 1px 5px rgba(181, 181, 181, 0.5);
   ;
   /* box-shadow: #a72f2f; */
