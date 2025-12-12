@@ -364,7 +364,6 @@ header .register-button {
   justify-content: center;
   padding: 20px 50px;
   overflow: hidden;
-
 }
 
 .category-section span {
@@ -380,7 +379,7 @@ header .register-button {
   display: flex;
   flex-wrap: wrap;
   width: 100%;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   gap: 20px;
 }
