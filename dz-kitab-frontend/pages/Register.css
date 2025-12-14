@@ -13,7 +13,7 @@
   display: flex;
   width: 100%;
   min-height: 100vh;
-  font-family: "Inter", "Roboto", sans-serif;
+  /* font-family: "Inter", "Roboto", sans-serif; */
 }
 
 /* ========== LEFT SIDE - Colored Panel ========== */
@@ -31,7 +31,7 @@
 
 /* Logo */
 .register-logo {
-  font-family: Georgia, "Times New Roman", serif;
+  /* font-family: Georgia, "Times New Roman", serif; */
   font-size: 20px;
   font-weight: 600;
   color: #e8a017;
