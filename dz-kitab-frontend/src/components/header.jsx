@@ -17,7 +17,7 @@ const Header = () => {
       <div className="guest-header">
         <div className="website-title">
           <img className="logo" src="./dz-kitablogo.png"></img>
-          <a className=" a">
+          <a href="/" className=" a">
             <h3 className="">
               <span className="  ">DZ</span>-KITAB
             </h3>
