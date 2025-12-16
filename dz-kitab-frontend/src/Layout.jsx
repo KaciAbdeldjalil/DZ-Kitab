@@ -5,16 +5,20 @@ import { Outlet, useLocation } from "react-router-dom";
 export default function Layout() {
     const location = useLocation();
 
-    const hideHeader =
-        location.pathname !== "/" ;  
+    const hideOnPages = [
+        "/login", 
+        "/register", 
+    ];
+
+    const shouldHide = hideOnPages.includes(location.pathname);
 
     return (
         <div className="layout">
-            {hideHeader ? null : <Header />}
-            <main>
+            {!shouldHide && <Header />}
+            <main className={shouldHide ? "full-height" : ""}>
                 <Outlet />
             </main>
-            {hideHeader ? null : <Footer />}
+            {!shouldHide && <Footer />}
         </div>
     );
 }

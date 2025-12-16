@@ -4,6 +4,7 @@ import { Landingpage } from "./pages/LandingPage";
 import Login from './pages/Login'
 import Register from './pages/Register'
 import { NotFound } from "./NotFound";
+import AddAnnounce from './pages/AddNewAnnounce'
 import "./App.css";
 export default function App() {
   return (
@@ -12,6 +13,7 @@ export default function App() {
         <Route path="/" element={<Landingpage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/addannounce" element={<AddAnnounce/>} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
