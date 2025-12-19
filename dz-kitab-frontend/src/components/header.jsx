@@ -24,9 +24,9 @@ const Header = () => {
           </a>
         </div>
         <div className="links">
-          <a>Home</a>
+          <a href="/addannounce" >Home</a>
           <a>About us</a>
-          <a>Contact us</a>
+          <a href="#contact">Contact us</a>
         </div>
         <div className="buttons">
             <button onClick={nagigate_to_login_page} className="login-button">Login</button>

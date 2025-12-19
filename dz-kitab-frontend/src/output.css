@@ -8,6 +8,14 @@
       "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
       "Courier New", monospace;
+    --color-amber-300: oklch(87.9% 0.169 91.605);
+    --color-amber-700: oklch(55.5% 0.163 48.998);
+    --spacing: 0.25rem;
+    --text-2xl: 1.5rem;
+    --text-2xl--line-height: calc(2 / 1.5);
+    --text-3xl: 1.875rem;
+    --text-3xl--line-height: calc(2.25 / 1.875);
+    --font-weight-bold: 700;
     --default-transition-duration: 150ms;
     --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     --default-font-family: var(--font-sans);
@@ -181,6 +189,12 @@
       max-width: 96rem;
     }
   }
+  .mt-16 {
+    margin-top: calc(var(--spacing) * 16);
+  }
+  .mt-20 {
+    margin-top: calc(var(--spacing) * 20);
+  }
   .flex {
     display: flex;
   }
@@ -202,6 +216,45 @@
   .border {
     border-style: var(--tw-border-style);
     border-width: 1px;
+  }
+  .bg-amber-700 {
+    background-color: var(--color-amber-700);
+  }
+  .p-\[40px\] {
+    padding: 40px;
+  }
+  .px-10 {
+    padding-inline: calc(var(--spacing) * 10);
+  }
+  .px-40 {
+    padding-inline: calc(var(--spacing) * 40);
+  }
+  .px-\[40px\] {
+    padding-inline: 40px;
+  }
+  .py-7 {
+    padding-block: calc(var(--spacing) * 7);
+  }
+  .py-40 {
+    padding-block: calc(var(--spacing) * 40);
+  }
+  .text-2xl {
+    font-size: var(--text-2xl);
+    line-height: var(--tw-leading, var(--text-2xl--line-height));
+  }
+  .text-3xl {
+    font-size: var(--text-3xl);
+    line-height: var(--tw-leading, var(--text-3xl--line-height));
+  }
+  .font-bold {
+    --tw-font-weight: var(--font-weight-bold);
+    font-weight: var(--font-weight-bold);
+  }
+  .text-\[Poppins\] {
+    color: Poppins;
+  }
+  .text-amber-300 {
+    color: var(--color-amber-300);
   }
   .underline {
     text-decoration-line: underline;
@@ -225,6 +278,7 @@ body {
   display: flex;
   flex-direction: column;
   font-family: Poppins;
+  scroll-behavior: smooth;
 }
 .notfound-page {
   display: flex;
@@ -584,7 +638,7 @@ header .register-button {
   height: auto;
   transition: transform 0.3s ease;
   flex: 1;
-  min-width: 240px;
+  min-width: 200px;
   max-width: 100%;
   box-sizing: border-box;
 }
@@ -594,7 +648,7 @@ header .register-button {
 .book-card .book-cover {
   position: relative;
   width: 100%;
-  height: 300px;
+  height: 200px;
 }
 .book-card .book-img {
   width: 100%;
@@ -1241,6 +1295,10 @@ footer p {
   inherits: false;
   initial-value: solid;
 }
+@property --tw-font-weight {
+  syntax: "*";
+  inherits: false;
+}
 @property --tw-outline-style {
   syntax: "*";
   inherits: false;
@@ -1308,6 +1366,7 @@ footer p {
       --tw-skew-x: initial;
       --tw-skew-y: initial;
       --tw-border-style: solid;
+      --tw-font-weight: initial;
       --tw-outline-style: solid;
       --tw-blur: initial;
       --tw-brightness: initial;

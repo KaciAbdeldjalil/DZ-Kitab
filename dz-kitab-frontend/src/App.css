@@ -7,6 +7,7 @@ body {
   display: flex;
   flex-direction: column;
   font-family: Poppins;
+  scroll-behavior: smooth;
 }
 
 /* ============================================================ */
@@ -442,7 +443,7 @@ header .register-button {
   height: auto;
   transition: transform 0.3s ease;
   flex: 1;
-  min-width: 240px;
+  min-width: 200px;
   max-width: 100%;
   box-sizing: border-box;
 }
@@ -454,7 +455,7 @@ header .register-button {
 .book-card .book-cover {
   position: relative;
   width: 100%;
-  height: 300px;
+  height: 200px;
 }
 
 .book-card .book-img {
