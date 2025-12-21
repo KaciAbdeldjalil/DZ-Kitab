@@ -1,0 +1,40 @@
+@"
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg-info/
+
+# Environment variables - CRITICAL!
+.env
+.env.local
+.env.*.local
+
+# Database
+*.db
+*.sqlite3
+postgres_data/
+
+# Uploads
+uploads/
+*.jpg
+*.jpeg
+*.png
+*.webp
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+"@ | Out-File -FilePath .gitignore -Encoding utf8
