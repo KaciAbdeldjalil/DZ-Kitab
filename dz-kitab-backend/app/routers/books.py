@@ -1,4 +1,3 @@
-
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from typing import List, Optional
@@ -20,7 +19,6 @@ from app.services.google_books import fetch_book_by_isbn
 
 router = APIRouter()
 
-
 def get_current_user_id(token: str = Depends(security), db: Session = Depends(get_db)) -> int:
     """Get the current authenticated user ID from token"""
     payload = verify_token(token)
@@ -40,7 +38,6 @@ def get_current_user_id(token: str = Depends(security), db: Session = Depends(ge
         )
     
     return user.id
-
 
 # ============================================
 # ISBN LOOKUP - AUTO-FILL BOOK INFO
@@ -105,7 +102,6 @@ async def lookup_isbn(isbn: str):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Erreur lors de la recherche du livre"
         )
-
 
 # ============================================
 # CREATE ANNOUNCEMENT
@@ -228,7 +224,6 @@ async def create_announcement(
             detail=f"Erreur lors de la création de l'annonce: {str(e)}"
         )
 
-
 # ============================================
 # GET ANNOUNCEMENTS
 # ============================================
@@ -304,7 +299,6 @@ def get_announcements(
             detail="Erreur lors de la récupération des annonces"
         )
 
-
 @router.get("/announcements/{announcement_id}", response_model=AnnouncementResponse)
 def get_announcement(announcement_id: int, db: Session = Depends(get_db)):
     """Get a specific announcement by ID"""
@@ -343,7 +337,6 @@ def get_announcement(announcement_id: int, db: Session = Depends(get_db)):
             "email": user.email
         }
     )
-
 
 # ============================================
 # MY ANNOUNCEMENTS
@@ -389,7 +382,6 @@ def get_my_announcements(
         total=len(formatted_announcements),
         announcements=formatted_announcements
     )
-
 
 # ============================================
 # UPDATE ANNOUNCEMENT
@@ -458,7 +450,6 @@ def update_announcement(
             "email": user.email
         }
     )
-
 
 # ============================================
 # DELETE ANNOUNCEMENT
