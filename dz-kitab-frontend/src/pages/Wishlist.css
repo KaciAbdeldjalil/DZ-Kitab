@@ -1,0 +1,159 @@
+.wishlist-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: white;
+  font-family: sans-serif;
+}
+
+.wishlist-top-section {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.wishlist-heart-icon {
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.wishlist-title {
+  font-size: 32px;
+  font-weight: bold;
+  color: #000000;
+  margin: 0;
+}
+
+.wishlist-table {
+  width: 100%;
+  max-width: 1100px;
+  display: flex;
+  flex-direction: column;
+}
+
+.wishlist-header-row {
+  display: flex;
+  align-items: center;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #f3a109;
+  font-weight: bold;
+  font-size: 18px;
+  color: #000000;
+}
+
+.wishlist-row {
+  display: flex;
+  align-items: center;
+  padding: 20px 0;
+  border-bottom: 1px solid #f3a109;
+}
+
+/* Column Widths & Alignment */
+
+/* Left Spacer in Header (matches Delete + Image width) */
+.wishlist-col-spacer-left {
+  width: 130px; /* 50px delete + 80px image */
+  flex-shrink: 0;
+}
+
+/* Delete Icon Column */
+.wishlist-col-delete {
+  width: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* Image Column */
+.wishlist-col-image {
+  width: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.wishlist-book-img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border: 1px solid #eee;
+}
+
+/* Name Column */
+.wishlist-col-header-name,
+.wishlist-col-name {
+  flex: 2;
+  text-align: left;
+  padding-left: 10px;
+  font-size: 18px;
+  color: #000000;
+}
+
+.wishlist-col-name {
+  font-weight: 500;
+}
+
+/* Price Column */
+.wishlist-col-header-price,
+.wishlist-col-price {
+  flex: 1;
+  text-align: center;
+  font-size: 18px;
+}
+
+.wishlist-col-price {
+  color: #f3a109;
+  font-weight: bold;
+}
+
+/* Status Column */
+.wishlist-col-header-status,
+.wishlist-col-status {
+  flex: 1;
+  text-align: center;
+  font-size: 18px;
+}
+
+.wishlist-col-status {
+  font-weight: 500;
+}
+
+.status-available {
+  color: #1314d7;
+}
+
+.status-unavailable {
+  color: #000000;
+}
+
+/* Action/Button Column */
+.wishlist-col-spacer-right,
+.wishlist-col-action {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 10px;
+}
+
+/* Button Styling */
+.wishlist-buy-btn {
+  background-color: #1314d7;
+  color: white;
+  border: none;
+  padding: 10px 25px;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.wishlist-buy-btn:hover {
+  opacity: 0.9;
+}

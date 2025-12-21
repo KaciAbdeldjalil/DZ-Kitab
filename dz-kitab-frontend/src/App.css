@@ -112,6 +112,8 @@ header .buttons {
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
 }
 
 header .buttons a {
@@ -172,6 +174,25 @@ header a:active {
   font-weight: 600;
 }
 
+header .wishlist-icon-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 30px;
+  height: 30px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  color: black;
+  transition: transform 0.3s ease;
+}
+
+header .wishlist-icon-btn:hover {
+  transform: scale(1.1);
+}
+
 header .login-button {
   display: flex;
   justify-content: center;
@@ -180,11 +201,15 @@ header .login-button {
   height: 30px;
   color: white;
   border-radius: 5px;
-  border: #1314d7 solid;
+  border: 1px solid #1314d7;
   background-color: #1314d7;
   cursor: pointer;
   transition: transform 0.3s ease;
   min-width: 80px;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: 14px;
 }
 
 header .register-button {
@@ -195,12 +220,18 @@ header .register-button {
   height: 30px;
   color: black;
   border-radius: 5px;
-  border: #1314d7 solid;
+  border: 1px solid #1314d7;
   background-color: white;
   cursor: pointer;
   transition: transform 0.3s ease;
   min-width: 80px;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: 14px;
 }
+
+
 .login-button:hover {
   transform: scale(1.2);
 }

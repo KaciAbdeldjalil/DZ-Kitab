@@ -15,5 +15,4 @@ def login_user():
 def test_auth():
     return {"message": "Test réussi!"}
 
-
    

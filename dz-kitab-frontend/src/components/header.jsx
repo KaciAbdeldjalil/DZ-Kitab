@@ -5,13 +5,13 @@ import { CiSearch } from "react-icons/ci";
 import { CiHeart } from "react-icons/ci";
 import { IoIosNotificationsOutline } from "react-icons/io";
 const Header = () => {
-  const navigate = useNavigate()
-  const nagigate_to_login_page = ()=>{
-    navigate('/login')
-  }
-  const nagigate_to_register_page = ()=>{
-    navigate('/register')
-  }
+  const navigate = useNavigate();
+  const nagigate_to_login_page = () => {
+    navigate("/login");
+  };
+  const nagigate_to_register_page = () => {
+    navigate("/register");
+  };
   return (
     <header>
       <div className="guest-header">
@@ -25,12 +25,37 @@ const Header = () => {
         </div>
         <div className="links">
           <a href="/addannounce" >Home</a>
+          <a href="/catalog">Catalog</a>
           <a>About us</a>
           <a href="#contact">Contact us</a>
         </div>
         <div className="buttons">
-            <button onClick={nagigate_to_login_page} className="login-button">Login</button>
-            <button onClick={nagigate_to_register_page} className="register-button">Register</button>
+          <button
+            onClick={() => navigate("/wishlist")}
+            className="wishlist-icon-btn"
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              height: "30px",
+              width: "30px",
+              padding: 0,
+            }}
+          >
+            <CiHeart size={28} />
+          </button>
+          <button onClick={nagigate_to_login_page} className="login-button">
+            Login
+          </button>
+          <button
+            onClick={nagigate_to_register_page}
+            className="register-button"
+          >
+            Register
+          </button>
         </div>
       </div>
 
