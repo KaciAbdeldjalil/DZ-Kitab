@@ -4,7 +4,7 @@ export const Hero = () => {
     return (
         <section className='hero'>
             <div className="hero-info">
-                <h3>
+                <h3 >
                     DZ-Kitab – La Révolution <span>du Livre en Algérie</span>
                 </h3>
                 <p className='p'> La plateforme où les étudiants achètent et vendent leurs manuels. Économisez jusqu'à 70% sur vos livres de cours.</p>

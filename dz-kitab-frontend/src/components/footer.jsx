@@ -21,7 +21,7 @@ const Footer = () => {
                         <li>Mentions légales</li>
                     </ul>
                 </div>
-                <div className="">
+                <div id='contact' className="">
                     <h3>Contact</h3>
                     <ul>
                         <li>support@dz-kitab.dz</li>
