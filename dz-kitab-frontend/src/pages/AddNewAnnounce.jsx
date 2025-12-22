@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './addnewannouce.css';
-import { FaSearch, FaBook, FaCheckCircle, FaCamera, FaRobot, FaArrowRight, FaArrowLeft, FaBarcode } from 'react-icons/fa';
+import { FaSearch, FaBook, FaCheckCircle, FaCamera, FaRobot, FaArrowRight, FaArrowLeft, FaBarcode, FaUpload } from 'react-icons/fa';
 import { MdVerified, MdWarning } from 'react-icons/md';
 
 function AddAnnounce() {
@@ -9,6 +9,7 @@ function AddAnnounce() {
 
     const [isbn, setIsbn] = useState('');
     const [bookFound, setBookFound] = useState(false);
+    const [manualEntry, setManualEntry] = useState(false);
     const [bookDetails, setBookDetails] = useState({
         title: '',
         authors: [],
@@ -25,7 +26,7 @@ function AddAnnounce() {
             missing: false,
             torn: false,
             stained: false,
-            score: 0 
+            score: 0
         },
         binding: {
             loose: false,
@@ -51,7 +52,7 @@ function AddAnnounce() {
         }
     };
     const [scoringData, setScoringData] = useState(initialScoring);
-    const [overallScore, setOverallScore] = useState(10); 
+    const [overallScore, setOverallScore] = useState(10);
 
     const [photos, setPhotos] = useState([]);
     const [price, setPrice] = useState('');
@@ -119,7 +120,7 @@ function AddAnnounce() {
         if (scoringData.damages.insects) score -= 80;
 
         if (!scoringData.accessories.complete) score -= 10;
-        if (scoringData.accessories.extras) score += 5; 
+        if (scoringData.accessories.extras) score += 5;
 
         setOverallScore(Math.max(0, Math.min(100, score)));
     }, [scoringData]);
@@ -136,6 +137,14 @@ function AddAnnounce() {
             preview: URL.createObjectURL(file)
         }));
         setPhotos([...photos, ...newPhotos]);
+    };
+
+    const handleManualCoverUpload = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const previewUrl = URL.createObjectURL(file);
+            setBookDetails(prev => ({ ...prev, thumbnail: previewUrl }));
+        }
     };
 
     const analyzePhotos = () => {
@@ -192,21 +201,112 @@ function AddAnnounce() {
                 {step === 1 && (
                     <div className="step-content fade-in">
                         <h2 className="section-title"><FaBarcode /> Identify Book</h2>
-                        <div className="isbn-search-box">
-                            <input
-                                type="text"
-                                placeholder="Enter ISBN (e.g. 9780134685991)"
-                                value={isbn}
-                                onChange={(e) => setIsbn(e.target.value)}
-                                className="modern-input"
-                            />
-                            <button onClick={fetchBookDetails} disabled={loading} className="btn-primary search-btn">
-                                {loading ? 'Searching...' : <><FaSearch /> Search</>}
-                            </button>
-                        </div>
-                        <p className="hint-text">Enter ISBN to auto-fill details (Google Books API)</p>
 
-                        {bookDetails.title && (
+                        {!manualEntry ? (
+                            <>
+                                <div className="isbn-search-box">
+                                    <input
+                                        type="text"
+                                        placeholder="Enter ISBN (e.g. 9780134685991)"
+                                        value={isbn}
+                                        onChange={(e) => setIsbn(e.target.value)}
+                                        className="modern-input"
+                                    />
+                                    <button onClick={fetchBookDetails} disabled={loading} className="btn-primary search-btn">
+                                        {loading ? 'Searching...' : <><FaSearch /> Search</>}
+                                    </button>
+                                </div>
+                                <p className="hint-text">Enter ISBN to auto-fill details (Google Books API)</p>
+
+                                <div className="manual-entry-link">
+                                    <span onClick={() => setManualEntry(true)} className="text-[#134BD7] cursor-pointer underline">
+                                        Book not found? Enter manually
+                                    </span>
+                                </div>
+                            </>
+                        ) : (
+                            <div className="manual-entry-form">
+                                <h3 className="text-lg font-semibold mb-4">Manual Entry</h3>
+                                <div className="grid grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Title</label>
+                                        <input
+                                            className="modern-input"
+                                            value={bookDetails.title}
+                                            onChange={(e) => setBookDetails({ ...bookDetails, title: e.target.value })}
+                                            placeholder="Book Title"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Author(s)</label>
+                                        <input
+                                            className="modern-input"
+                                            value={bookDetails.authors.join(', ')}
+                                            onChange={(e) => setBookDetails({ ...bookDetails, authors: e.target.value.split(', ') })}
+                                            placeholder="Authors (comma separated)"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Page Count</label>
+                                        <input
+                                            type="number"
+                                            className="modern-input"
+                                            value={bookDetails.pageCount}
+                                            onChange={(e) => setBookDetails({ ...bookDetails, pageCount: e.target.value })}
+                                            placeholder="e.g. 300"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Category</label>
+                                        <input
+                                            className="modern-input"
+                                            value={bookDetails.categories[0] || ''}
+                                            onChange={(e) => setBookDetails({ ...bookDetails, categories: [e.target.value] })}
+                                            placeholder="e.g. Fiction"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Publication Date</label>
+                                        <input
+                                            type="date"
+                                            className="modern-input"
+                                            value={bookDetails.publishedDate}
+                                            onChange={(e) => setBookDetails({ ...bookDetails, publishedDate: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="col-span-2">
+                                        <label className="block text-sm font-medium mb-1">Book Cover</label>
+                                        <div className="manual-cover-upload">
+                                            <input
+                                                type="file"
+                                                id="manual-cover"
+                                                accept="image/*"
+                                                onChange={handleManualCoverUpload}
+                                                className="hidden-input"
+                                            />
+                                            <label htmlFor="manual-cover" className="manual-cover-label">
+                                                {bookDetails.thumbnail ? (
+                                                    <div className="cover-preview-mini">
+                                                        <img src={bookDetails.thumbnail} alt="Selected Cover" />
+                                                        <span>Change Cover</span>
+                                                    </div>
+                                                ) : (
+                                                    <div className="upload-placeholder">
+                                                        <FaUpload />
+                                                        <span>Upload Cover Image</span>
+                                                    </div>
+                                                )}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button onClick={() => setManualEntry(false)} className="text-sm text-gray-500 underline mb-4">
+                                    Back to ISBN Search
+                                </button>
+                            </div>
+                        )}
+
+                        {bookDetails.title && !manualEntry && (
                             <div className="book-preview-card">
                                 {bookDetails.thumbnail && <img src={bookDetails.thumbnail} alt="Cover" className="book-cover-preview" />}
                                 <div className="book-info-preview">
@@ -224,12 +324,13 @@ function AddAnnounce() {
                             <button
                                 className="btn-primary"
                                 onClick={() => setStep(2)}
-                                disabled={!bookDetails.title && !bookFound}  
+                                disabled={!bookDetails.title && !bookFound && !manualEntry}
                             >
                                 Next Step <FaArrowRight />
                             </button>
                         </div>
                     </div>
+
                 )}
 
                 {step === 2 && (

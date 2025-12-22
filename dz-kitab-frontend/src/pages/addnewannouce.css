@@ -23,7 +23,7 @@
     text-align: center;
     font-size: 2.5rem;
     margin-bottom: 2rem;
-    background:  #134BD7;
+    background: #134BD7;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     font-weight: 800;
@@ -146,7 +146,7 @@
 }
 
 .btn-primary {
-    background:  #134BD7;
+    background: #134BD7;
     color: white;
     box-shadow: 0 4px 15px rgba(74, 74, 243, 0.3);
 }
@@ -232,9 +232,11 @@
     align-items: center;
     gap: 1rem;
 }
-.action-row{
+
+.action-row {
     margin-top: 2rem;
 }
+
 .score-circle {
     width: 60px;
     height: 60px;
@@ -397,6 +399,7 @@
     color: #888;
     margin-top: 0.5rem;
 }
+
 .back-button {
     background: #134BD7;
     color: white;
@@ -405,7 +408,7 @@
 }
 
 .back-button:hover {
-  transform: scale(1.02);
+    transform: scale(1.02);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 }
 
@@ -434,4 +437,117 @@
     .btn-secondary {
         width: 100%;
     }
+}
+
+/* Manual Entry Form */
+.manual-entry-link {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+}
+
+.manual-entry-form {
+    background: #f8f9ff;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid #eef0f5;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.manual-entry-form label {
+    display: block;
+    margin-bottom: 0.3rem;
+    color: #555;
+    font-weight: 500;
+}
+
+.grid-cols-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.mb-4 {
+    margin-bottom: 1rem;
+}
+
+.mb-1 {
+    margin-bottom: 0.25rem;
+}
+
+.text-sm {
+    font-size: 0.875rem;
+}
+
+.font-medium {
+    font-weight: 500;
+}
+
+.font-semibold {
+    font-weight: 600;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.underline {
+    text-decoration: underline;
+}
+
+.text-gray-500 {
+    color: #6b7280;
+}
+
+@media (max-width: 600px) {
+    .grid-cols-2 {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Manual Cover Upload */
+.col-span-2 {
+    grid-column: span 2;
+}
+
+.hidden-input {
+    display: none !important;
+}
+
+.manual-cover-label {
+    display: block;
+    border: 2px dashed #cbd5e1;
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+    cursor: pointer;
+    background: #fff;
+    transition: all 0.2s;
+}
+
+.manual-cover-label:hover {
+    border-color: #4a4af3;
+    background: #f8faff;
+}
+
+.upload-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+.cover-preview-mini {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.cover-preview-mini img {
+    height: 60px;
+    border-radius: 4px;
+    object-fit: cover;
 }
