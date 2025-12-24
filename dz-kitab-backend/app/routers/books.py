@@ -1,8 +1,10 @@
+# app/routers/books.py
+
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from app.database import get_db
-from app.models.book import Book, Announcement
+from app.models.book import Book, Announcement, BookCategoryEnum
 from app.models.user import User
 from app.schemas.book import (
     AnnouncementCreate,
@@ -18,6 +20,7 @@ from app.services.jwt import verify_token
 from app.services.google_books import fetch_book_by_isbn
 
 router = APIRouter()
+
 
 def get_current_user_id(token: str = Depends(security), db: Session = Depends(get_db)) -> int:
     """Get the current authenticated user ID from token"""
@@ -38,6 +41,19 @@ def get_current_user_id(token: str = Depends(security), db: Session = Depends(ge
         )
     
     return user.id
+
+
+# ============================================
+# CATEGORIES
+# ============================================
+
+@router.get("/categories", response_model=List[str])
+def get_categories():
+    """
+    Obtenir la liste de toutes les catégories disponibles
+    """
+    return [category.value for category in BookCategoryEnum]
+
 
 # ============================================
 # ISBN LOOKUP - AUTO-FILL BOOK INFO
@@ -71,6 +87,7 @@ async def test_isbn_lookup():
         message="Données de test (Google Books API indisponible)"
     )
 
+
 @router.get("/isbn/{isbn}", response_model=ISBNLookupResponse)
 async def lookup_isbn(isbn: str):
     """
@@ -103,6 +120,7 @@ async def lookup_isbn(isbn: str):
             detail="Erreur lors de la recherche du livre"
         )
 
+
 # ============================================
 # CREATE ANNOUNCEMENT
 # ============================================
@@ -114,12 +132,12 @@ async def create_announcement(
     user_id: int = Depends(get_current_user_id)
 ):
     """
-    Create a new book announcement
+    Create a new book announcement with category, page count and publication date
     
     This endpoint:
     1. Fetches book info from Google Books API using the ISBN
     2. Creates or retrieves the book in the database
-    3. Creates the announcement linked to that book and the current user
+    3. Creates the announcement with category, page count, publication date
     """
     try:
         # 1. Fetch book info from Google Books
@@ -135,7 +153,7 @@ async def create_announcement(
         book = db.query(Book).filter(Book.isbn == book_info["isbn"]).first()
         
         if not book:
-            # Create new book entry
+            # Create new book entry with page_count from Google Books
             book = Book(
                 isbn=book_info["isbn"],
                 title=book_info["title"],
@@ -144,7 +162,7 @@ async def create_announcement(
                 publisher=book_info.get("publisher"),
                 published_date=book_info.get("published_date"),
                 description=book_info.get("description"),
-                page_count=book_info.get("page_count"),
+                page_count=book_info.get("page_count"),  # From Google Books
                 categories=", ".join(book_info.get("categories", [])),
                 language=book_info.get("language", "fr"),
                 cover_image_url=book_info.get("cover_image_url"),
@@ -155,7 +173,11 @@ async def create_announcement(
             db.commit()
             db.refresh(book)
         
-        # 3. Create announcement
+        # 3. Use page_count and publication_date from user input or fallback to book data
+        page_count = announcement_data.page_count or book.page_count
+        publication_date = announcement_data.publication_date or book.published_date
+        
+        # 4. Create announcement with new fields
         custom_images_str = None
         if announcement_data.custom_images:
             custom_images_str = ",".join(announcement_data.custom_images)
@@ -163,30 +185,39 @@ async def create_announcement(
         announcement = Announcement(
             book_id=book.id,
             user_id=user_id,
+            category=announcement_data.category.value,  # Catégorie choisie
             price=announcement_data.price,
+            market_price=announcement_data.market_price,  # Prix du marché
             condition=announcement_data.condition.value,
             description=announcement_data.description,
             location=announcement_data.location,
-            custom_images=custom_images_str
+            custom_images=custom_images_str,
+            page_count=page_count,  # Nombre de pages
+            publication_date=publication_date  # Date de publication
         )
         
         db.add(announcement)
         db.commit()
         db.refresh(announcement)
         
-        # 4. Prepare response with nested data
+        # 5. Prepare response with nested data
         user = db.query(User).filter(User.id == user_id).first()
         
         return AnnouncementResponse(
             id=announcement.id,
             book_id=announcement.book_id,
             user_id=announcement.user_id,
+            category=announcement.category.value,
             price=announcement.price,
+            market_price=announcement.market_price,
+            final_calculated_price=announcement.final_calculated_price,
             condition=announcement.condition.value,
             status=announcement.status.value,
             description=announcement.description,
             custom_images=announcement.custom_images,
             location=announcement.location,
+            page_count=announcement.page_count,
+            publication_date=announcement.publication_date,
             views_count=announcement.views_count,
             created_at=announcement.created_at,
             updated_at=announcement.updated_at,
@@ -224,6 +255,7 @@ async def create_announcement(
             detail=f"Erreur lors de la création de l'annonce: {str(e)}"
         )
 
+
 # ============================================
 # GET ANNOUNCEMENTS
 # ============================================
@@ -234,6 +266,7 @@ def get_announcements(
     limit: int = Query(20, ge=1, le=100),
     status: Optional[str] = None,
     condition: Optional[str] = None,
+    category: Optional[str] = None,
     db: Session = Depends(get_db)
 ):
     """
@@ -242,6 +275,7 @@ def get_announcements(
     Optional filters:
     - status: Filter by announcement status
     - condition: Filter by book condition
+    - category: Filter by book category
     """
     try:
         query = db.query(Announcement)
@@ -251,6 +285,8 @@ def get_announcements(
             query = query.filter(Announcement.status == status)
         if condition:
             query = query.filter(Announcement.condition == condition)
+        if category:
+            query = query.filter(Announcement.category == category)
         
         # Get total count
         total = query.count()
@@ -269,12 +305,17 @@ def get_announcements(
                     id=ann.id,
                     book_id=ann.book_id,
                     user_id=ann.user_id,
+                    category=ann.category.value,
                     price=ann.price,
+                    market_price=ann.market_price,
+                    final_calculated_price=ann.final_calculated_price,
                     condition=ann.condition.value,
                     status=ann.status.value,
                     description=ann.description,
                     custom_images=ann.custom_images,
                     location=ann.location,
+                    page_count=ann.page_count,
+                    publication_date=ann.publication_date,
                     views_count=ann.views_count,
                     created_at=ann.created_at,
                     updated_at=ann.updated_at,
@@ -299,6 +340,7 @@ def get_announcements(
             detail="Erreur lors de la récupération des annonces"
         )
 
+
 @router.get("/announcements/{announcement_id}", response_model=AnnouncementResponse)
 def get_announcement(announcement_id: int, db: Session = Depends(get_db)):
     """Get a specific announcement by ID"""
@@ -321,12 +363,17 @@ def get_announcement(announcement_id: int, db: Session = Depends(get_db)):
         id=announcement.id,
         book_id=announcement.book_id,
         user_id=announcement.user_id,
+        category=announcement.category.value,
         price=announcement.price,
+        market_price=announcement.market_price,
+        final_calculated_price=announcement.final_calculated_price,
         condition=announcement.condition.value,
         status=announcement.status.value,
         description=announcement.description,
         custom_images=announcement.custom_images,
         location=announcement.location,
+        page_count=announcement.page_count,
+        publication_date=announcement.publication_date,
         views_count=announcement.views_count,
         created_at=announcement.created_at,
         updated_at=announcement.updated_at,
@@ -337,6 +384,7 @@ def get_announcement(announcement_id: int, db: Session = Depends(get_db)):
             "email": user.email
         }
     )
+
 
 # ============================================
 # MY ANNOUNCEMENTS
@@ -360,12 +408,17 @@ def get_my_announcements(
                 id=ann.id,
                 book_id=ann.book_id,
                 user_id=ann.user_id,
+                category=ann.category.value,
                 price=ann.price,
+                market_price=ann.market_price,
+                final_calculated_price=ann.final_calculated_price,
                 condition=ann.condition.value,
                 status=ann.status.value,
                 description=ann.description,
                 custom_images=ann.custom_images,
                 location=ann.location,
+                page_count=ann.page_count,
+                publication_date=ann.publication_date,
                 views_count=ann.views_count,
                 created_at=ann.created_at,
                 updated_at=ann.updated_at,
@@ -378,15 +431,12 @@ def get_my_announcements(
             )
         )
     
-    return AnnouncementListResponse(
-        total=len(formatted_announcements),
-        announcements=formatted_announcements
-    )
-
+    return AnnouncementListResponse(total=len(formatted_announcements),
+    announcements=formatted_announcements
+)
 # ============================================
 # UPDATE ANNOUNCEMENT
 # ============================================
-
 @router.put("/announcements/{announcement_id}", response_model=AnnouncementResponse)
 def update_announcement(
     announcement_id: int,
@@ -411,8 +461,12 @@ def update_announcement(
         )
     
     # Update fields
+    if update_data.category is not None:
+        announcement.category = update_data.category.value
     if update_data.price is not None:
         announcement.price = update_data.price
+    if update_data.market_price is not None:
+        announcement.market_price = update_data.market_price
     if update_data.condition is not None:
         announcement.condition = update_data.condition.value
     if update_data.description is not None:
@@ -423,6 +477,10 @@ def update_announcement(
         announcement.status = update_data.status.value
     if update_data.custom_images is not None:
         announcement.custom_images = ",".join(update_data.custom_images)
+    if update_data.page_count is not None:
+        announcement.page_count = update_data.page_count
+    if update_data.publication_date is not None:
+        announcement.publication_date = update_data.publication_date
     
     db.commit()
     db.refresh(announcement)
@@ -434,12 +492,17 @@ def update_announcement(
         id=announcement.id,
         book_id=announcement.book_id,
         user_id=announcement.user_id,
+        category=announcement.category.value if announcement.category else None,  # ✅ Sécurisé
         price=announcement.price,
-        condition=announcement.condition.value,
-        status=announcement.status.value,
+        market_price=announcement.market_price,
+        final_calculated_price=announcement.final_calculated_price,
+        condition=announcement.condition.value if announcement.condition else None,  # ✅ Sécurisé
+        status=announcement.status.value if announcement.status else None,  # ✅ Sécurisé
         description=announcement.description,
         custom_images=announcement.custom_images,
         location=announcement.location,
+        page_count=announcement.page_count,
+        publication_date=announcement.publication_date,
         views_count=announcement.views_count,
         created_at=announcement.created_at,
         updated_at=announcement.updated_at,
@@ -450,11 +513,9 @@ def update_announcement(
             "email": user.email
         }
     )
-
 # ============================================
 # DELETE ANNOUNCEMENT
 # ============================================
-
 @router.delete("/announcements/{announcement_id}")
 def delete_announcement(
     announcement_id: int,
@@ -477,10 +538,18 @@ def delete_announcement(
             detail="Vous n'êtes pas autorisé à supprimer cette annonce"
         )
     
-    db.delete(announcement)
-    db.commit()
-    
-    return {
-        "message": "Annonce supprimée avec succès",
-        "announcement_id": announcement_id
-    }
+    try:
+        db.delete(announcement)
+        db.commit()
+        
+        return {
+            "message": "Annonce supprimée avec succès",
+            "announcement_id": announcement_id
+        }
+    except Exception as e:
+        db.rollback()
+        print(f"❌ Error deleting announcement: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Erreur lors de la suppression de l'annonce"
+        )
