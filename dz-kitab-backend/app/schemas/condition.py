@@ -34,7 +34,7 @@ class BookConditionInput(BaseModel):
     cover_score: CoverScore
     damage_score: DamageScore
     accessories_score: AccessoriesScore
-    base_price: Optional[float] = None
+    market_price: Optional[float] = Field(None, description="Prix du marché en DZD")
     photo_urls: Optional[List[str]] = None
 
 class BookConditionResponse(BaseModel):
@@ -47,8 +47,8 @@ class BookConditionResponse(BaseModel):
     accessories_score: float
     overall_score: float
     condition_label: str
-    base_price: Optional[float] = None
-    suggested_price: Optional[float] = None
+    market_price: Optional[float] = None
+    final_calculated_price: Optional[float] = None  # Prix final basé sur market_price * (overall_score/100)
     price_multiplier: Optional[float] = None
     has_photos: bool
     photo_urls: Optional[List[str]] = None
@@ -69,11 +69,12 @@ class ConditionSummary(BaseModel):
     breakdown: Dict[str, ScoreBreakdown]
     recommendations: List[str]
     price_impact: str
+    final_calculated_price: Optional[float] = None  # Prix final calculé
 
 class PriceSuggestionResponse(BaseModel):
-    base_price: float
-    suggested_price: float
-    multiplier: float
+    market_price: float
     overall_score: float
+    final_calculated_price: float  # market_price * (overall_score/100)
     condition_label: str
+    price_breakdown: Dict[str, float]  # Détails du calcul
     message: str
