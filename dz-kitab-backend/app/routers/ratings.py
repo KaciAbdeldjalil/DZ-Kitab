@@ -1,5 +1,3 @@
-# app/routers/ratings.py
-
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from typing import List
@@ -17,6 +15,7 @@ from app.schemas.rating import (
 )
 from app.middleware.auth import security
 from app.services.jwt import verify_token
+from app.services.notification_service import notify_new_rating
 
 router = APIRouter()
 
@@ -91,6 +90,13 @@ def create_rating(
         db.add(rating)
         db.commit()
         db.refresh(rating)
+        
+        # 🔔 NOTIFICATION: Notifier le vendeur de la nouvelle note
+        try:
+            notify_new_rating(db, rating)
+        except Exception as e:
+            print(f"⚠️ Erreur notification: {e}")
+            # Continue même si la notification échoue
         
         update_seller_stats(db, seller_id)
         
