@@ -5,9 +5,11 @@ import axios from 'axios'
 
 const Register = () => {
   const navigate = useNavigate();
+  const [username, setUsername] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [university, setUniversity] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -22,24 +24,32 @@ const Register = () => {
     try {
       const response = await axios.post(
         "http://localhost:8000/auth/register", {
+        username: username,
         first_name: firstName,
         last_name: lastName,
         email: email,
+        phone_number: phoneNumber,
         password: password,
         university: university,
       });
       alert('good job')
       console.log(response.data)
-      setFirstName(''),
-      setLastName(''),
-      setEmail(''),
-      setPassword(''),
-      setUniversity('') 
+      setUsername(''),
+        setFirstName(''),
+        setLastName(''),
+        setEmail(''),
+        setPhoneNumber(''),
+        setPassword(''),
+        setUniversity('')
     } catch (error) {
       if (error.response) {
-        console.log(error)
+        console.log("422 DETAIL 👉", error.response.data);
+        alert(JSON.stringify(error.response.data.detail, null, 2));
+      } else {
+        console.error(error);
       }
     }
+
   };
 
   const handleLogIn = () => {
@@ -77,6 +87,16 @@ const Register = () => {
           </p>
 
           <form onSubmit={handleSubmit} className="register-form">
+            <div className="form-group">
+              <input
+                type="text"
+                className="form-input"
+                placeholder="Username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+              />
+            </div>
             <div className="form-row">
               <div className="form-group">
                 <input
@@ -107,6 +127,17 @@ const Register = () => {
                 placeholder="Enter your email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <input
+                type="tel"
+                className="form-input"
+                placeholder="Phone Number (e.g. 0550123456)"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
                 required
               />
             </div>
