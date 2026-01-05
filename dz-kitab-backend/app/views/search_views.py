@@ -1,11 +1,10 @@
 from rest_framework.generics import ListAPIView
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter
-from .models import Announcement
-from .serializers import AnnouncementSerializer
-from .filters import AnnouncementAdvancedFilter
-from .pagination import AnnouncementSearchPagination
-
+from app.models import Announcement
+from app.serializers import AnnouncementSerializer
+from app.filters import AnnouncementAdvancedFilter
+from app.pagination import AnnouncementSearchPagination
 class AnnouncementAdvancedSearchView(ListAPIView):
 
     queryset = Announcement.objects.select_related('book').filter(status='Active')
