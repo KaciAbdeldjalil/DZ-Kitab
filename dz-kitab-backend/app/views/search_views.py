@@ -5,6 +5,8 @@ from app.models import Announcement
 from app.serializers import AnnouncementSerializer
 from app.filters import AnnouncementAdvancedFilter
 from app.pagination import AnnouncementSearchPagination
+from app.pagination.announcement_pagination import AnnouncementSearchPagination
+
 class AnnouncementAdvancedSearchView(ListAPIView):
 
     queryset = Announcement.objects.select_related('book').filter(status='Active')
