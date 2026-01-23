@@ -12,6 +12,14 @@ from app.views.favorite_views import FavoriteView, FavoriteDeleteView
 from app.views.annonce_views import AnnonceViewSet
 from app.views.checkout_views import CheckoutView
 
+from app.views.badge_views import BadgeViewSet, UserBadgeViewset
+#----badge
+router = DefaultRouter()
+router.register(r'badges', BadgeViewSet, basename='badge')
+router.register(r'user-badges', UserBadgeViewSet, basename='user-badge')
+
+urlpatterns += router.urls
+
 # --- Routes classiques ---
 urlpatterns = [
     # Checkout
