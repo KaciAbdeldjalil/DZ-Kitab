@@ -21,7 +21,7 @@ function NavAdmin() {
 
      <div className="links flex gap-5">
   <Link to="/">Home</Link>
-  <Link to="/UsersAdmin">User management</Link>
+  <Link to="/UsersAdmin">Users management</Link>
   <Link to="/AnnouncementsAdmin">Announcements management</Link>
   <Link to="/DashboardAdmin">Dashboard</Link>
 </div>
