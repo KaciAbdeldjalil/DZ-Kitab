@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // <-- Import pour la navigation
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, AreaChart, Area } from "recharts";
 import NavAdmin from "./navbarAdmin";
 
@@ -38,9 +39,7 @@ function MetricCard({ title, value, chart }) {
     <div style={{ background: 'white', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
       <div style={{ fontSize: '13px', color: '#6B7280', marginBottom: '8px' }}>{title}</div>
       <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#111827', marginBottom: '12px' }}>{value}</div>
-      <div style={{ height: '60px' }}>
-        {chart ? chart : <div style={{ background: '#F3F4F6', height: '100%', borderRadius: '4px' }} />}
-      </div>
+      {chart && <div style={{ height: '60px' }}>{chart}</div>}
     </div>
   );
 }
@@ -95,10 +94,17 @@ function CategoryItem({ name, value, color, percentage }) {
 
 // --- Composant principal ---
 export default function AdminDashboard() {
+  const navigate = useNavigate(); // ← Navigation
+  useEffect(() => {
+    const token = localStorage.getItem("token"); // Vérifie le token
+    if (!token) {
+      navigate("/login"); // Redirige vers login si pas connecté
+    }
+  }, [navigate]);
+
   return (
     <>
       <NavAdmin />
-
       <div style={{ minHeight: '100vh', background: '#F9FAFB', padding: '20px' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
 

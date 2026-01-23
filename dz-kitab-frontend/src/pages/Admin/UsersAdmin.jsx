@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // ← Import pour navigation
 import "./UsersAdmin.css";
 import NavAdmin from "./navbarAdmin";
 
@@ -10,34 +11,20 @@ const initialUsers = [
 ];
 
 export default function AdminUsers() {
+  const navigate = useNavigate(); // ← Navigation
+  useEffect(() => {
+    const token = localStorage.getItem("token"); // Vérifie le token
+    if (!token) {
+      navigate("/login"); // Redirige vers login si pas connecté
+    }
+  }, [navigate]);
+
   const [users, setUsers] = useState(initialUsers);
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterRole, setFilterRole] = useState("all");
   const [sortBy, setSortBy] = useState("name");
   const [sortOrder, setSortOrder] = useState("asc");
-
-  const toggleStatus = (id) => {
-    const user = users.find(u => u.id === id);
-    if (user.role === "Admin") {
-      alert("❌ Vous ne pouvez pas bloquer un administrateur !");
-      return;
-    }
-    setUsers(users.map(u =>
-      u.id === id ? { ...u, status: u.status === "active" ? "blocked" : "active" } : u
-    ));
-  };
-
-  const deleteUser = (id) => {
-    const user = users.find(u => u.id === id);
-    if (user.role === "Admin") {
-      alert("❌ Vous ne pouvez pas supprimer un administrateur !");
-      return;
-    }
-    if (window.confirm("Êtes-vous sûr de vouloir supprimer cet utilisateur ?")) {
-      setUsers(users.filter(u => u.id !== id));
-    }
-  };
 
   const handleSort = (field) => {
     if (sortBy === field) {
@@ -46,6 +33,18 @@ export default function AdminUsers() {
       setSortBy(field);
       setSortOrder("asc");
     }
+  };
+
+  const toggleStatus = (id) => {
+    setUsers(prev =>
+      prev.map(u =>
+        u.id === id ? { ...u, status: u.status === "active" ? "blocked" : "active" } : u
+      )
+    );
+  };
+
+  const deleteUser = (id) => {
+    setUsers(prev => prev.filter(u => u.id !== id));
   };
 
   let filteredUsers = users.filter(user => {

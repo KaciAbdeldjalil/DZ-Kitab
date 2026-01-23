@@ -74,9 +74,9 @@ export default function App() {
           </PrivateRoute>
         } />
         <Route path="/dashboard" element={
-          <PrivateRoute>
+          <PublicRoute>
             <Dashboard/>
-          </PrivateRoute>
+          </PublicRoute>
         } />
         <Route path="/message" element={
           <PrivateRoute>

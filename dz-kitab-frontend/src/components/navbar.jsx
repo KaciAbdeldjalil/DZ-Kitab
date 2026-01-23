@@ -17,7 +17,7 @@ const Navbar = () => {
       <div className="guest-header">
         <div className="website-title">
           <img className="logo" src="./dz-kitablogo.png" alt="Logo" />
-          <Link to="/" className="a">
+          <Link to="/LandingPage" className="a">
             <h3>
               <span>DZ</span>-KITAB
             </h3>
@@ -33,7 +33,7 @@ const Navbar = () => {
 
         <div className="buttons flex items-center hover:text-[#F3A109] gap-4">
           <button
-            onClick={() => navigate("/wishlist")}
+            onClick={() => navigate("/Wishlist")}
             className="wishlist-icon-btn"
             style={{
               background: "none",
