@@ -1,39 +1,43 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // <-- Import pour la navigation
+import { useNavigate } from "react-router-dom";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, AreaChart, Area } from "recharts";
 import NavAdmin from "./navbarAdmin";
 
-// --- Données Mockées ---
-const newListingsData = [
-  { month: "Jan", value: 234 }, { month: "Feb", value: 267 }, { month: "Mar", value: 298 }, 
+// --- Mock Data ---
+const mockMetrics = {
+  totalUsers: 1389,
+  totalListings: 4021,
+  activeListings: 890,
+  activeUsers30d: 1127,
+  newListings30d: 489,
+  activeUsersTrend: [{ value: 1050 }, { value: 1120 }, { value: 1180 }, { value: 1247 }, { value: 1310 }, { value: 1389 }],
+  newListingsTrend: [{ value: 3456 }, { value: 3598 }, { value: 3712 }, { value: 3845 }, { value: 3892 }, { value: 4021 }]
+};
+
+const mockNewListings = [
+  { month: "Jan", value: 234 }, { month: "Feb", value: 267 }, { month: "Mar", value: 298 },
   { month: "Apr", value: 312 }, { month: "May", value: 345 }, { month: "Jun", value: 378 },
   { month: "Jul", value: 402 }, { month: "Aug", value: 389 }, { month: "Sep", value: 421 },
-  { month: "Oct", value: 445 }, { month: "Nov", value: 467 }, { month: "Dec", value: 489 },
+  { month: "Oct", value: 445 }, { month: "Nov", value: 467 }, { month: "Dec", value: 489 }
 ];
 
-const miniChartData1 = [{ value: 1050 }, { value: 1120 }, { value: 1180 }, { value: 1247 }, { value: 1310 }, { value: 1389 }];
-const miniChartData2 = [{ value: 3456 }, { value: 3598 }, { value: 3712 }, { value: 3845 }, { value: 3892 }, { value: 4021 }];
-
-const topBooks = [
+const mockTopBooks = [
   { title: "Python Algorithms", category: "Computer Science", listings: 47, image: "https://images.unsplash.com/photo-1589998059171-988d887df646?w=80&h=80&fit=crop", percentage: 98 },
   { title: "Mathematics 1st Year", category: "Academic", listings: 42, image: "https://images.unsplash.com/photo-1596495577886-d920f1fb7238?w=80&h=80&fit=crop", percentage: 89 },
   { title: "Physics Senior Year", category: "Academic", listings: 38, image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=80&h=80&fit=crop", percentage: 81 },
   { title: "Introduction to React", category: "Computer Science", listings: 35, image: "https://images.unsplash.com/photo-1532012197267-da84d127e765?w=80&h=80&fit=crop", percentage: 74 },
   { title: "Algerian History", category: "History", listings: 31, image: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=80&h=80&fit=crop", percentage: 66 },
-  { title: "Organic Chemistry", category: "Science", listings: 28, image: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=80&h=80&fit=crop", percentage: 60 },
+  { title: "Organic Chemistry", category: "Science", listings: 28, image: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=80&h=80&fit=crop", percentage: 60 }
 ];
 
-const salesByCategory = [
+const mockSalesByCategory = [
   { name: "Computer Science", value: 1247, color: "#3B82F6", percentage: 31 },
   { name: "Academic", value: 1089, color: "#10B981", percentage: 27 },
   { name: "Science", value: 845, color: "#F59E0B", percentage: 21 },
   { name: "Literature", value: 562, color: "#8B5CF6", percentage: 14 },
-  { name: "History", value: 278, color: "#EF4444", percentage: 7 },
+  { name: "History", value: 278, color: "#EF4444", percentage: 7 }
 ];
 
-const totalSales = salesByCategory.reduce((sum, cat) => sum + cat.value, 0);
-
-// --- Composants ---
 function MetricCard({ title, value, chart }) {
   return (
     <div style={{ background: 'white', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
@@ -92,42 +96,52 @@ function CategoryItem({ name, value, color, percentage }) {
   );
 }
 
-// --- Composant principal ---
+// --- Main component ---
 export default function AdminDashboard() {
-  const navigate = useNavigate(); // ← Navigation
+  const navigate = useNavigate();
+  const [metrics, setMetrics] = useState({});
+  const [newListings, setNewListings] = useState([]);
+  const [topBooks, setTopBooks] = useState([]);
+  const [salesByCategory, setSalesByCategory] = useState([]);
+
   useEffect(() => {
-    const token = localStorage.getItem("token"); // Vérifie le token
-    if (!token) {
-      navigate("/login"); // Redirige vers login si pas connecté
-    }
+    const token = localStorage.getItem("token");
+    if (!token) navigate("/login");
+
+    // Use mocks for now
+    setMetrics(mockMetrics);
+    setNewListings(mockNewListings);
+    setTopBooks(mockTopBooks);
+    setSalesByCategory(mockSalesByCategory);
   }, [navigate]);
+
+  const totalSales = salesByCategory.reduce((sum, cat) => sum + cat.value, 0);
 
   return (
     <>
       <NavAdmin />
       <div style={{ minHeight: '100vh', background: '#F9FAFB', padding: '20px' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-
           {/* HEADER */}
           <div style={{ marginBottom: '32px' }}>
             <h1 style={{ fontSize: '32px', fontWeight: 'bold', color: '#111827', margin: 0 }}>Admin Dashboard</h1>
             <p style={{ fontSize: '14px', color: '#6B7280', marginTop: '4px' }}>Welcome to DZ-Kitab</p>
           </div>
 
-          {/* --- BLOC DU HAUT --- */}
+          {/* METRICS */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '20px', marginBottom: '32px' }}>
-            <MetricCard title="Total Users" value="1,389" />
-            <MetricCard title="Total Listings" value="4,021" />
-            <MetricCard title="Active listings" value={8} />
-            <MetricCard title="Active Users (30d)" value="1,127" chart={<MiniLineChart data={miniChartData1} />} />
-            <MetricCard title="New Listings (30d)" value="489" chart={<MiniLineChart data={miniChartData2} />} />
+            <MetricCard title="Total Users" value={metrics.totalUsers} />
+            <MetricCard title="Total Listings" value={metrics.totalListings} />
+            <MetricCard title="Active Listings" value={metrics.activeListings} />
+            <MetricCard title="Active Users (30d)" value={metrics.activeUsers30d} chart={<MiniLineChart data={metrics.activeUsersTrend} />} />
+            <MetricCard title="New Listings (30d)" value={metrics.newListings30d} chart={<MiniLineChart data={metrics.newListingsTrend} />} />
           </div>
 
-          {/* New Listings Overview */}
+          {/* NEW LISTINGS CHART */}
           <div style={{ background: 'white', borderRadius: '12px', padding: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', marginBottom: '32px' }}>
             <h3 style={{ fontSize: '18px', fontWeight: 'bold', color: '#111827', marginBottom: '20px' }}>New Listings Overview</h3>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={newListingsData}>
+              <BarChart data={newListings}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis dataKey="month" />
                 <YAxis />
@@ -136,7 +150,7 @@ export default function AdminDashboard() {
             </ResponsiveContainer>
           </div>
 
-          {/* --- BLOC DU BAS --- */}
+          {/* BOTTOM BLOCKS */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(500px, 1fr))', gap: '20px' }}>
             <div style={{ background: 'white', borderRadius: '12px', padding: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
               <h3 style={{ fontSize: '18px', fontWeight: 'bold', color: '#111827', marginBottom: '20px' }}>Most Popular Books</h3>
@@ -166,7 +180,6 @@ export default function AdminDashboard() {
               {salesByCategory.map((cat, i) => <CategoryItem key={i} {...cat} />)}
             </div>
           </div>
-
         </div>
       </div>
     </>
