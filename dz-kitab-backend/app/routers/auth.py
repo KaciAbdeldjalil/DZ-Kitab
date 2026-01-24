@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.user import User
-from app.schemas.user import UserCreate, UserLogin, UserResponse, TokenResponse
+from app.schemas.user import UserCreate, UserLogin, UserResponse, TokenResponse, UserUpdate
 from app.middleware.auth import security
 from app.services.auth import create_user_token, verify_password, get_password_hash
 from app.services.jwt import verify_token
@@ -219,3 +219,51 @@ def test_auth():
             "GET /auth/me"
         ]
     }
+@router.put("/me", response_model=UserResponse)
+def update_profile(
+    user_update: UserUpdate, 
+    db: Session = Depends(get_db),
+    # This uses your existing security dependency to get the token
+    token: str = Depends(security) 
+):
+    """Update current user profile info and photo"""
+    
+    # 1. Verify token and get user (same logic as your get_current_user)
+    payload = verify_token(token)
+    if not payload:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token invalide ou expiré"
+        )
+        
+    email = payload.get("sub")
+    user = db.query(User).filter(User.email == email).first()
+    
+    if not user:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+
+    # 2. Update fields ONLY if they are sent (not None)
+    if user_update.first_name is not None:
+        user.first_name = user_update.first_name
+    if user_update.last_name is not None:
+        user.last_name = user_update.last_name
+    if user_update.university is not None:
+        user.university = user_update.university
+    if user_update.phone_number is not None:
+        user.phone_number = user_update.phone_number
+        
+    # HERE IS THE PHOTO UPDATE
+    if user_update.profile_picture_url is not None:
+        user.profile_picture_url = user_update.profile_picture_url
+
+    # [cite_start]3. Save to DB [cite: 321]
+    try:
+        db.commit()
+        db.refresh(user)
+        return user
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Erreur lors de la mise à jour du profil"
+        )
