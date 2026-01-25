@@ -52,7 +52,7 @@ except Exception as e:
 # ===============================
 app = FastAPI(
     title="DZ-Kitab API",
-    version="2.1.0",  # Version mise  jour
+    version="2.1.2",  # Global cleaning fix
     description="API pour la plateforme d'change de livres universitaires avec systme de recommandations par cursus",
     docs_url="/docs",
     redoc_url="/redoc"
@@ -147,8 +147,9 @@ def health_check():
     
     db_status = "connected"
     try:
+        from sqlalchemy import text
         db = SessionLocal()
-        db.execute("SELECT 1")
+        db.execute(text("SELECT 1"))
         db.close()
     except Exception as e:
         db_status = f"error: {str(e)}"
@@ -156,7 +157,7 @@ def health_check():
     return {
         "status": "healthy" if db_status == "connected" else "unhealthy",
         "database": db_status,
-        "version": "2.1.0",
+        "version": "2.1.2",
         "timestamp": time.time()
     }
 

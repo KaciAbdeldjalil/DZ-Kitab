@@ -53,14 +53,15 @@ if os.getenv("ENVIRONMENT") != "production":
 # URL de connexion - Priorit absolue  la variable d'environnement
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-# Nettoyage prventif de l'URL (suppression des \r et espaces)
-if DATABASE_URL:
-    DATABASE_URL = DATABASE_URL.strip().replace("\r", "").replace("\n", "")
-
 # Fallback ULTIME pour la production si les variables d'environnement chouent
 if not DATABASE_URL and os.getenv("ENVIRONMENT") == "production":
     DATABASE_URL = "postgresql://neondb_owner:npg_W4JkICUq7Fbr@ep-young-pine-ah3abvjg-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require"
-    print("WARNING: Using hardcoded production fallback for DATABASE_URL")
+
+if DATABASE_URL:
+    import re
+    DATABASE_URL = re.sub(r'[\x00-\x1F\x7F-\x9F]', '', DATABASE_URL).strip()
+else:
+    pass # DATABASE_URL IS STILL EMPTY!
 
 # Fallback pour le dveloppement local seulement
 if not DATABASE_URL:
@@ -72,8 +73,6 @@ if not DATABASE_URL:
     DB_PORT = "3306"
     DATABASE_URL = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
-print(f"DEBUG: STARTUP DATABASE CONFIG")
-print(f"DEBUG: Environment: {os.getenv('ENVIRONMENT')}")
 print(f"DEBUG: Has DATABASE_URL env var: {bool(os.getenv('DATABASE_URL'))}")
 print(f"DEBUG: Final DATABASE_URL type: {'Postgres' if 'postgres' in DATABASE_URL.lower() else 'Other'}")
 

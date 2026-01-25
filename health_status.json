@@ -1,0 +1,1 @@
+{"status":"unhealthy","database":"error: Textual SQL expression 'SELECT 1' should be explicitly declared as text('SELECT 1')","url_debug":"...sslmode=require","url_codes":[113,117,105,114,101],"version":"2.1.0","timestamp":1769371249.5469322}
