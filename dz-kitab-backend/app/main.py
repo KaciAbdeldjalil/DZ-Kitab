@@ -1,6 +1,6 @@
 # app/main.py
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.exceptions import RequestValidationError
 import time
@@ -19,7 +19,7 @@ from app.core.errors import (
 )
 from app.core.logging_config import setup_logging, RequestLoggingMiddleware
 from app.routers import (
-    upload, books, condition, ratings, notifications, auth, 
+    upload, books, condition, ratings, notifications, auth,
     wishlist, admin, recommendations, dashboard, messages, curriculum
 )
 from sqlalchemy.exc import IntegrityError, OperationalError
@@ -45,6 +45,21 @@ app.add_middleware(RequestLoggingMiddleware)
 # CONFIGURE CORS
 # ===============================
 configure_cors(app)
+
+# ===============================
+# GLOBAL OPTIONS HANDLER (preflight for Vercel)
+# ===============================
+@app.options("/{full_path:path}")
+async def preflight_handler(full_path: str, request: Request):
+    """
+    Handle preflight OPTIONS requests for serverless deployment
+    """
+    response = Response()
+    response.headers["Access-Control-Allow-Origin"] = "https://dz-kitab-frontend.vercel.app"
+    response.headers["Access-Control-Allow-Methods"] = "GET,POST,PUT,DELETE,OPTIONS,PATCH"
+    response.headers["Access-Control-Allow-Headers"] = "Authorization,Content-Type"
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    return response
 
 # ===============================
 # REGISTER EXCEPTION HANDLERS
