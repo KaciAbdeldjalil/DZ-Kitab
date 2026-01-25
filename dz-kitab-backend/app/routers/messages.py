@@ -38,7 +38,7 @@ def get_current_user_id(token: str = Depends(security), db: Session = Depends(ge
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Utilisateur non trouvé"
+            detail="Utilisateur non trouv"
         )
     
     return user.id
@@ -54,34 +54,39 @@ def contact_seller(
     user_id: int = Depends(get_current_user_id)
 ):
     """
-    📧 Contacter un vendeur via le formulaire de contact
+    Contacter un vendeur via le formulaire de contact
     
-    - Crée une conversation si elle n'existe pas
+    - Cree une conversation si elle n'existe pas
     - Envoie le premier message
     - Notifie le vendeur par email (optionnel)
     """
     try:
-        # 1. Vérifier l'annonce
+        print(f"Contact seller started: ann_id={contact_data.announcement_id}, buyer_id={user_id}")
+        # 1. Vrifier l'annonce
         announcement = db.query(Announcement).filter(
             Announcement.id == contact_data.announcement_id
         ).first()
         
         if not announcement:
+            print(f"Error: Announcement {contact_data.announcement_id} not found")
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Annonce non trouvée"
+                detail="Annonce non trouve"
             )
         
         seller_id = announcement.user_id
+        print(f"Seller found: {seller_id}")
         
-        # 2. Empêcher de se contacter soi-même
+        # 2. Empcher de se contacter soi-mme
         if user_id == seller_id:
+            print(f"Error: User {user_id} tried to contact own announcement")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Vous ne pouvez pas contacter votre propre annonce"
             )
         
-        # 3. Chercher ou créer la conversation
+        # 3. Chercher ou crer la conversation
+        print("Checking for existing conversation...")
         conversation = db.query(Conversation).filter(
             Conversation.announcement_id == contact_data.announcement_id,
             Conversation.buyer_id == user_id,
@@ -89,6 +94,7 @@ def contact_seller(
         ).first()
         
         if not conversation:
+            print("Creating new conversation...")
             conversation = Conversation(
                 announcement_id=contact_data.announcement_id,
                 buyer_id=user_id,
@@ -97,47 +103,67 @@ def contact_seller(
             db.add(conversation)
             db.flush()
         
-        # 4. Créer le message
+        print(f"Conversation ID: {conversation.id}")
+
+        # 4. Crer le message (inclure les coordonnes de l'acheteur)
+        full_content = contact_data.message
+        if contact_data.address or contact_data.phone:
+            full_content += "\n\n--- Coordonnes de contact ---"
+            if contact_data.address:
+                full_content += f"\nAdresse: {contact_data.address}"
+            if contact_data.phone:
+                full_content += f"\nTlphone: {contact_data.phone}"
+
+        print("Creating message object...")
         message = Message(
             conversation_id=conversation.id,
             sender_id=user_id,
             receiver_id=seller_id,
-            content=contact_data.message
+            content=full_content
         )
         
         db.add(message)
         
-        # 5. Mettre à jour la conversation
+        # 5. Mettre  jour la conversation
         conversation.last_message = contact_data.message[:100]
         conversation.last_message_at = datetime.utcnow()
         
+        print("Commiting to database...")
         db.commit()
         db.refresh(message)
+        print(f"Message created: {message.id}")
         
-        # 6. Envoyer notification email au vendeur
+        # 6. Envoyer notification email au vendeur (Robust version)
         try:
+            print("Preparing email notification...")
             seller = db.query(User).filter(User.id == seller_id).first()
             buyer = db.query(User).filter(User.id == user_id).first()
-            book = db.query(Book).filter(Book.id == announcement.book_id).first()
             
+            # Use announcement.book relationship instead of extra query if possible
+            book_title = "Livre"
+            if announcement.book:
+                book_title = announcement.book.title
+
             if seller and buyer:
-                email_subject = f"Nouveau message concernant '{book.title}'"
+                email_subject = f"Nouveau message concernant '{book_title}'"
                 email_html = f"""
-                <h2>Nouveau message reçu</h2>
-                <p><strong>{buyer.username}</strong> vous a envoyé un message concernant votre annonce:</p>
-                <h3>{book.title}</h3>
+                <h2>Nouveau message reu</h2>
+                <p><strong>{buyer.username}</strong> vous a envoy un message concernant votre annonce:</p>
+                <h3>{book_title}</h3>
                 <p><strong>Message:</strong></p>
                 <blockquote>{contact_data.message}</blockquote>
-                <p>Connectez-vous à DZ-Kitab pour répondre: <a href="http://localhost:3000/messages">Voir mes messages</a></p>
+                <p>Connectez-vous  DZ-Kitab pour rpondre.</p>
                 """
                 
+                print(f"Sending email to {seller.email}...")
                 send_email(seller.email, email_subject, email_html)
+                print("Email attempt finished")
         except Exception as e:
-            print(f"⚠️ Erreur envoi email: {e}")
+            print(f"Non-fatal error in email notification: {e}")
         
         return {
             "success": True,
-            "message": "Message envoyé avec succès",
+            "message": "Message envoy avec succs",
             "conversation_id": conversation.id,
             "message_id": message.id
         }
@@ -145,7 +171,9 @@ def contact_seller(
     except HTTPException:
         raise
     except Exception as e:
-        print(f"❌ Erreur contact vendeur: {e}")
+        print(f"Erreur contact vendeur: {e}")
+        import traceback
+        traceback.print_exc()
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -164,10 +192,10 @@ def get_my_conversations(
     user_id: int = Depends(get_current_user_id)
 ):
     """
-    📬 Obtenir toutes les conversations de l'utilisateur
+     Obtenir toutes les conversations de l'utilisateur
     """
     try:
-        # Récupérer les conversations où l'utilisateur est buyer ou seller
+        # Rcuprer les conversations o l'utilisateur est buyer ou seller
         query = db.query(Conversation).filter(
             (Conversation.buyer_id == user_id) | (Conversation.seller_id == user_id),
             Conversation.is_active == True
@@ -184,14 +212,14 @@ def get_my_conversations(
             Message.is_read == False
         ).count()
         
-        # Formater les réponses
+        # Formater les rponses
         formatted_conversations = []
         for conv in conversations:
-            # Déterminer l'autre utilisateur
+            # Dterminer l'autre utilisateur
             other_user_id = conv.seller_id if conv.buyer_id == user_id else conv.buyer_id
             other_user = db.query(User).filter(User.id == other_user_id).first()
             
-            # Récupérer l'annonce
+            # Rcuprer l'annonce
             announcement = None
             announcement_title = None
             announcement_cover = None
@@ -236,10 +264,10 @@ def get_my_conversations(
         )
         
     except Exception as e:
-        print(f"❌ Erreur récupération conversations: {e}")
+        print(f" Erreur rcupration conversations: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Erreur lors de la récupération des conversations"
+            detail="Erreur lors de la rcupration des conversations"
         )
 
 @router.get("/conversations/{conversation_id}", response_model=ConversationWithMessagesResponse)
@@ -249,7 +277,7 @@ def get_conversation(
     user_id: int = Depends(get_current_user_id)
 ):
     """
-    💬 Obtenir une conversation avec tous ses messages
+     Obtenir une conversation avec tous ses messages
     """
     try:
         conversation = db.query(Conversation).filter(
@@ -259,29 +287,29 @@ def get_conversation(
         if not conversation:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Conversation non trouvée"
+                detail="Conversation non trouve"
             )
         
-        # Vérifier que l'utilisateur fait partie de la conversation
+        # Vrifier que l'utilisateur fait partie de la conversation
         if user_id not in [conversation.buyer_id, conversation.seller_id]:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Accès non autorisé à cette conversation"
+                detail="Accs non autoris  cette conversation"
             )
         
-        # Récupérer les messages
+        # Rcuprer les messages
         messages = db.query(Message).filter(
             Message.conversation_id == conversation_id
         ).order_by(Message.created_at.asc()).all()
         
-        # Marquer les messages reçus comme lus
+        # Marquer les messages reus comme lus
         for message in messages:
             if message.receiver_id == user_id and not message.is_read:
                 message.mark_as_read()
         
         db.commit()
         
-        # Déterminer l'autre utilisateur
+        # Dterminer l'autre utilisateur
         other_user_id = conversation.seller_id if conversation.buyer_id == user_id else conversation.buyer_id
         other_user = db.query(User).filter(User.id == other_user_id).first()
         
@@ -339,10 +367,10 @@ def get_conversation(
     except HTTPException:
         raise
     except Exception as e:
-        print(f"❌ Erreur récupération conversation: {e}")
+        print(f" Erreur rcupration conversation: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Erreur lors de la récupération de la conversation"
+            detail="Erreur lors de la rcupration de la conversation"
         )
 
 # ============================================
@@ -357,30 +385,35 @@ def send_message(
     user_id: int = Depends(get_current_user_id)
 ):
     """
-    ✉️ Envoyer un message dans une conversation
+     Envoyer un message dans une conversation
     """
     try:
+        print(f"send_message started: conv_id={conversation_id}, user_id={user_id}")
         conversation = db.query(Conversation).filter(
             Conversation.id == conversation_id
         ).first()
         
         if not conversation:
+            print(f"Error: Conversation {conversation_id} not found")
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Conversation non trouvée"
+                detail="Conversation non trouve"
             )
         
-        # Vérifier que l'utilisateur fait partie de la conversation
+        # Vrifier que l'utilisateur fait partie de la conversation
         if user_id not in [conversation.buyer_id, conversation.seller_id]:
+            print(f"Error: User {user_id} not in conversation {conversation_id}")
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Accès non autorisé"
+                detail="Accs non autoris"
             )
         
-        # Déterminer le destinataire
+        # Dterminer le destinataire
         receiver_id = conversation.seller_id if user_id == conversation.buyer_id else conversation.buyer_id
+        print(f"Receiver determined: {receiver_id}")
         
-        # Créer le message
+        # Crer le message
+        print("Creating message object...")
         message = Message(
             conversation_id=conversation_id,
             sender_id=user_id,
@@ -390,12 +423,14 @@ def send_message(
         
         db.add(message)
         
-        # Mettre à jour la conversation
+        # Mettre  jour la conversation
         conversation.last_message = content[:100]
         conversation.last_message_at = datetime.utcnow()
         
+        print("Commiting message to database...")
         db.commit()
         db.refresh(message)
+        print(f"Message sent successfully: {message.id}")
         
         sender = db.query(User).filter(User.id == user_id).first()
         receiver = db.query(User).filter(User.id == receiver_id).first()
@@ -406,7 +441,7 @@ def send_message(
             sender_id=message.sender_id,
             receiver_id=message.receiver_id,
             content=message.content,
-            status=message.status.value,
+            status=message.status.value if hasattr(message.status, 'value') else str(message.status),
             is_read=message.is_read,
             read_at=message.read_at,
             created_at=message.created_at,
@@ -417,11 +452,13 @@ def send_message(
     except HTTPException:
         raise
     except Exception as e:
-        print(f"❌ Erreur envoi message: {e}")
+        print(f"Erreur envoi message: {e}")
+        import traceback
+        traceback.print_exc()
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Erreur lors de l'envoi du message"
+            detail=f"Erreur backend message: {str(e)}"
         )
 
 @router.get("/test")

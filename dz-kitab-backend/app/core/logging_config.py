@@ -15,9 +15,9 @@ import json
 
 def setup_logging():
     """
-    Configurer le système de logging
+    Configurer le systme de logging
     """
-    # Créer le dossier logs
+    # Crer le dossier logs
     log_dir = Path("logs")
     log_dir.mkdir(exist_ok=True)
     
@@ -48,11 +48,11 @@ def setup_logging():
     error_handler = logging.getLogger().handlers[2]
     error_handler.setLevel(logging.ERROR)
     
-    # Logger spécifiques
+    # Logger spcifiques
     logging.getLogger("uvicorn.access").setLevel(logging.WARNING)
     logging.getLogger("sqlalchemy.engine").setLevel(logging.WARNING)
     
-    print(f"✅ Logging configuré - Dossier: {log_dir.absolute()}")
+    print(f" Logging configur - Dossier: {log_dir.absolute()}")
 
 # ============================================
 # MIDDLEWARE DE LOGGING
@@ -60,25 +60,25 @@ def setup_logging():
 
 class RequestLoggingMiddleware(BaseHTTPMiddleware):
     """
-    Middleware pour logger toutes les requêtes et réponses
+    Middleware pour logger toutes les requtes et rponses
     """
     
     async def dispatch(self, request: Request, call_next):
-        # Générer un ID de requête unique
+        # Gnrer un ID de requte unique
         request_id = f"{int(time.time() * 1000)}"
         request.state.request_id = request_id
         
-        # Enregistrer le début de la requête
+        # Enregistrer le dbut de la requte
         start_time = time.time()
         
-        # Logs de la requête
+        # Logs de la requte
         logger = logging.getLogger("api.requests")
         logger.info(
             f"[{request_id}] {request.method} {request.url.path} - "
             f"Client: {request.client.host if request.client else 'Unknown'}"
         )
         
-        # Logs des headers (en développement seulement)
+        # Logs des headers (en dveloppement seulement)
         import os
         if os.getenv("ENVIRONMENT") == "development":
             logger.debug(f"[{request_id}] Headers: {dict(request.headers)}")
@@ -89,7 +89,7 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
             # Calculer le temps de traitement
             process_time = time.time() - start_time
             
-            # Logs de la réponse
+            # Logs de la rponse
             logger.info(
                 f"[{request_id}] Status: {response.status_code} - "
                 f"Time: {process_time:.3f}s"
@@ -112,12 +112,12 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
             raise
 
 # ============================================
-# LOGGER D'ERREURS STRUCTURÉ
+# LOGGER D'ERREURS STRUCTUR
 # ============================================
 
 class ErrorLogger:
     """
-    Logger d'erreurs structuré pour une meilleure analyse
+    Logger d'erreurs structur pour une meilleure analyse
     """
     
     def __init__(self):
@@ -134,7 +134,7 @@ class ErrorLogger:
         extra_data: dict = None
     ):
         """
-        Logger une erreur de manière structurée
+        Logger une erreur de manire structure
         """
         error_data = {
             "timestamp": datetime.utcnow().isoformat(),
@@ -143,7 +143,7 @@ class ErrorLogger:
             "status_code": status_code,
         }
         
-        # Informations sur la requête
+        # Informations sur la requte
         if request:
             error_data["request"] = {
                 "method": request.method,
@@ -158,19 +158,19 @@ class ErrorLogger:
         if stack_trace:
             error_data["stack_trace"] = stack_trace
         
-        # Données supplémentaires
+        # Donnes supplmentaires
         if extra_data:
             error_data["extra"] = extra_data
         
         # Logger en JSON pour une analyse facile
         self.logger.error(json.dumps(error_data, ensure_ascii=False))
         
-        # Écrire aussi dans un fichier JSON Lines
+        # crire aussi dans un fichier JSON Lines
         try:
             with open(self.error_log_file, "a", encoding="utf-8") as f:
                 f.write(json.dumps(error_data, ensure_ascii=False) + "\n")
         except Exception as e:
-            self.logger.error(f"Impossible d'écrire dans le fichier de log: {e}")
+            self.logger.error(f"Impossible d'crire dans le fichier de log: {e}")
 
 # Instance globale
 error_logger = ErrorLogger()
@@ -184,7 +184,7 @@ import traceback
 
 def log_exceptions(func):
     """
-    Décorateur pour logger automatiquement les exceptions
+    Dcorateur pour logger automatiquement les exceptions
     """
     @wraps(func)
     async def wrapper(*args, **kwargs):
@@ -198,7 +198,7 @@ def log_exceptions(func):
                 exc_info=True
             )
             
-            # Logger de manière structurée
+            # Logger de manire structure
             error_logger.log_error(
                 error_type=type(exc).__name__,
                 message=str(exc),

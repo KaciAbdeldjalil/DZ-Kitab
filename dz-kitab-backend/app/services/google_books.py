@@ -72,16 +72,16 @@ async def fetch_book_by_isbn(isbn: str) -> Optional[Dict[str, Any]]:
         return book_info
         
     except httpx.HTTPError as e:
-        print(f"❌ HTTP error while fetching book: {e}")
+        print(f" HTTP error while fetching book: {e}")
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Impossible de contacter l'API Google Books"
         )
     except Exception as e:
-        print(f"❌ Error fetching book by ISBN: {e}")
+        print(f" Error fetching book by ISBN: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Erreur lors de la récupération des données du livre: {str(e)}"
+            detail=f"Erreur lors de la rcupration des donnes du livre: {str(e)}"
         )
 
 
@@ -133,7 +133,7 @@ async def search_books(query: str, max_results: int = 10) -> list:
         return books
         
     except Exception as e:
-        print(f"❌ Error searching books: {e}")
+        print(f" Error searching books: {e}")
         return []
 
 

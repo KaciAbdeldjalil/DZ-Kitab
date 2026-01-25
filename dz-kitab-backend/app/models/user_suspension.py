@@ -47,7 +47,7 @@ class UserSuspension(Base):
         return UserSuspension(
             user_id=user_id,
             reason="low_ratings",
-            description=f"Suspension automatique: {zero_rating_count} notes à 0 étoile",
+            description=f"Suspension automatique: {zero_rating_count} notes  0 toile",
             suspension_end_date=datetime.utcnow() + timedelta(days=duration_days),
             zero_rating_count=zero_rating_count,
             created_by_admin=False

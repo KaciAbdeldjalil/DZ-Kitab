@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import api from "../utils/api";
 import "./ContactSeller.css";
-
+import { getCookie } from "../utils/cookies";
 const ContactSeller = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -33,73 +33,66 @@ const ContactSeller = () => {
   };
 
   const handleSubmit = async () => {
-    if (!formData.address || !formData.phone) {
-      alert("Address and phone number are required");
+    if (!formData.address && !formData.phone) {
+      alert("Please provide at least one contact method (Address or Phone).");
       return;
     }
 
-    if (!book) return;
+    if (!formData.message.trim()) {
+      alert("Please enter a message.");
+      return;
+    }
+
+    if (!book || !book.id) {
+      alert("Announcement information missing.");
+      return;
+    }
 
     try {
       setLoading(true);
-      // Create conversation or send message
-      // Endpoint: POST /api/messages/conversations?other_user_id=...&announcement_id=...
-      // Then POST message?
-      // Or simpler: The backend might not have a direct "Contact Seller" single endpoint yet based on previous files.
-      // Let's assume we create a conversation or send a message.
-      // Checking backend standard: usually start conversation with initial message.
-      // Let's try to create a conversation first.
 
-      // 1. Check/Create conversation
-      // For simplicity, let's assume we just send a message to start it.
-      // We need the seller's user ID.
-      // 'book' object usually comes from Listing, which has 'user' (seller) object?
-      // Let's verify structure. In Listing.jsx: book object has title, author... but maybe not user_id explicitly in the manual map?
-      // Listing.jsx map: id, title, author... user_id is in response.data.announcements but mappedBooks might miss it.
-      // We need to ensure we pass the seller ID.
+      // Map to backend schema ContactSellerRequest
+      const payload = {
+        announcement_id: Number(book.id),
+        title: book.title || "Unknown",
+        email: book.user?.email || "buyer@example.com", // Placeholder
+        address: formData.address || "",
+        phone: formData.phone || "",
+        message: formData.message,
+      };
 
-      // If we don't have seller ID, we can't send.
-      // Assuming book.user_id or book.seller_id exists.
+      console.log("Sending payload:", payload);
 
-      const sellerId = book.user?.id || book.user_id;
-
-      if (!sellerId) {
-        alert("Error: Seller information missing.");
-        return;
-      }
-
-      // Construct initial message
-      const fullMessage = `
-**Interest in:** ${book.title}
-**Contact Info:**
-Phone: ${formData.phone}
-Address: ${formData.address}
-
-${formData.message}
-        `.trim();
-
-      // API call to create conversation/send message
-      // Using the logic from Messages.jsx: 
-      // POST /api/messages/conversations/{id}/messages ?
-      // We first need a conversation. 
-      // Let's try POST /api/messages/conversations with params
-
-      await api.post('/api/messages/conversations', {
-        participant_id: sellerId,
-        announcement_id: book.id, // announcement ID
-        initial_message: fullMessage
+      const response = await api.post("/api/messages/contact-seller", payload, {
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${getCookie("access_token")}`,
+        },
       });
+      console.log("Response:", response.data);
+
+      const conversationId = response.data.conversation_id;
 
       alert("Message sent successfully!");
-      navigate('/message'); // Go to messages to see the chat
+      if (conversationId) {
+        navigate(`/message?conversationId=${conversationId}`);
+      } else {
+        navigate("/message");
+      }
 
     } catch (error) {
-      console.error("Error sending message:", error);
-      alert("Failed to send message. " + (error.response?.data?.detail || ""));
+      console.error("Contact seller error details:", error.response?.data || error.message);
+      const errorDetail = error.response?.data?.detail;
+      const errorMessage = Array.isArray(errorDetail)
+        ? errorDetail.map(e => `${e.loc.join('.')}: ${e.msg}`).join('\n')
+        : (errorDetail || error.response?.data?.message || error.message);
+
+      alert("Error sending message:\n" + errorMessage);
     } finally {
       setLoading(false);
     }
   };
+
 
   const handleCancel = () => {
     navigate(-1);

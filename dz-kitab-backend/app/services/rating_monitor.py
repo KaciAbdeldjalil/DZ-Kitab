@@ -17,19 +17,19 @@ from app.services.email import (
 from datetime import datetime, timedelta
 
 # Seuils de suspension
-SUSPENSION_THRESHOLD = 10  # 10 notes à 0 = suspension
-LOW_RATING_WARNING_THRESHOLD = 3  # 3 notes à 0 = alerte
+SUSPENSION_THRESHOLD = 10  # 10 notes  0 = suspension
+LOW_RATING_WARNING_THRESHOLD = 3  # 3 notes  0 = alerte
 SUSPENSION_DURATION_DAYS = 15
 
 def check_and_handle_low_ratings(db: Session, seller_id: int):
     """
-    Vérifier les notes d'un vendeur et prendre des mesures si nécessaire
+    Vrifier les notes d'un vendeur et prendre des mesures si ncessaire
     
-    - Alerte à 3 notes de 0 étoile
-    - Suspension automatique à 10 notes de 0 étoile
+    - Alerte  3 notes de 0 toile
+    - Suspension automatique  10 notes de 0 toile
     """
     try:
-        # Compter les notes à 0 et 1 étoile
+        # Compter les notes  0 et 1 toile
         zero_rating_count = db.query(Rating).filter(
             Rating.seller_id == seller_id,
             Rating.rating == 0
@@ -40,7 +40,7 @@ def check_and_handle_low_ratings(db: Session, seller_id: int):
             Rating.rating <= 1
         ).count()
         
-        # Récupérer les stats du vendeur
+        # Rcuprer les stats du vendeur
         stats = db.query(SellerStats).filter(SellerStats.user_id == seller_id).first()
         average_rating = stats.average_rating if stats else 0.0
         
@@ -48,38 +48,38 @@ def check_and_handle_low_ratings(db: Session, seller_id: int):
         if not seller:
             return
         
-        print(f"📊 Checking ratings for seller {seller.username}: {zero_rating_count} zero ratings, avg: {average_rating:.2f}")
+        print(f" Checking ratings for seller {seller.username}: {zero_rating_count} zero ratings, avg: {average_rating:.2f}")
         
-        # Vérifier si déjà suspendu
+        # Vrifier si dj suspendu
         active_suspension = db.query(UserSuspension).filter(
             UserSuspension.user_id == seller_id,
             UserSuspension.is_active == True
         ).first()
         
         if active_suspension:
-            print(f"⚠️ User {seller.username} already suspended")
+            print(f" User {seller.username} already suspended")
             return
         
-        # SUSPENSION AUTOMATIQUE: 10 notes à 0
+        # SUSPENSION AUTOMATIQUE: 10 notes  0
         if zero_rating_count >= SUSPENSION_THRESHOLD:
-            print(f"🚫 Suspending user {seller.username} - {zero_rating_count} zero ratings")
+            print(f" Suspending user {seller.username} - {zero_rating_count} zero ratings")
             suspend_user(db, seller_id, zero_rating_count)
             return
         
-        # ALERTE: 3 notes à 0 ou plus
+        # ALERTE: 3 notes  0 ou plus
         if zero_rating_count >= LOW_RATING_WARNING_THRESHOLD or low_rating_count >= 5:
-            # Vérifier si une alerte a déjà été envoyée récemment
+            # Vrifier si une alerte a dj t envoye rcemment
             recent_alert = db.query(RatingAlert).filter(
                 RatingAlert.user_id == seller_id,
                 RatingAlert.created_at >= datetime.utcnow() - timedelta(days=7)
             ).first()
             
             if not recent_alert:
-                print(f"⚠️ Sending low rating alert to {seller.username}")
+                print(f" Sending low rating alert to {seller.username}")
                 send_low_rating_warning(db, seller_id, low_rating_count, average_rating)
         
     except Exception as e:
-        print(f"❌ Error checking low ratings: {e}")
+        print(f" Error checking low ratings: {e}")
         db.rollback()
 
 def suspend_user(db: Session, seller_id: int, zero_rating_count: int):
@@ -91,7 +91,7 @@ def suspend_user(db: Session, seller_id: int, zero_rating_count: int):
         if not seller:
             return
         
-        # Créer la suspension
+        # Crer la suspension
         suspension = UserSuspension.create_low_rating_suspension(
             user_id=seller_id,
             zero_rating_count=zero_rating_count,
@@ -100,7 +100,7 @@ def suspend_user(db: Session, seller_id: int, zero_rating_count: int):
         
         db.add(suspension)
         
-        # Désactiver le compte
+        # Dsactiver le compte
         seller.is_active = False
         
         db.commit()
@@ -121,12 +121,12 @@ def suspend_user(db: Session, seller_id: int, zero_rating_count: int):
                 suspension_end
             )
         except Exception as e:
-            print(f"⚠️ Failed to send suspension email: {e}")
+            print(f" Failed to send suspension email: {e}")
         
-        print(f"✅ User {seller.username} suspended until {suspension_end}")
+        print(f" User {seller.username} suspended until {suspension_end}")
         
     except Exception as e:
-        print(f"❌ Error suspending user: {e}")
+        print(f" Error suspending user: {e}")
         db.rollback()
 
 def send_low_rating_warning(db: Session, seller_id: int, low_rating_count: int, average_rating: float):
@@ -138,7 +138,7 @@ def send_low_rating_warning(db: Session, seller_id: int, low_rating_count: int, 
         if not seller:
             return
         
-        # Créer l'alerte
+        # Crer l'alerte
         alert = RatingAlert(
             user_id=seller_id,
             alert_type="low_rating_warning",
@@ -166,18 +166,18 @@ def send_low_rating_warning(db: Session, seller_id: int, low_rating_count: int, 
                 alert.email_sent_at = datetime.utcnow()
                 db.commit()
         except Exception as e:
-            print(f"⚠️ Failed to send warning email: {e}")
+            print(f" Failed to send warning email: {e}")
         
-        print(f"✅ Low rating warning sent to {seller.username}")
+        print(f" Low rating warning sent to {seller.username}")
         
     except Exception as e:
-        print(f"❌ Error sending low rating warning: {e}")
+        print(f" Error sending low rating warning: {e}")
         db.rollback()
 
 def check_expired_suspensions(db: Session):
     """
-    Vérifier et réactiver les comptes dont la suspension a expiré
-    À exécuter régulièrement (cron job)
+    Vrifier et ractiver les comptes dont la suspension a expir
+     excuter rgulirement (cron job)
     """
     try:
         expired_suspensions = db.query(UserSuspension).filter(
@@ -189,15 +189,15 @@ def check_expired_suspensions(db: Session):
             reactivate_user(db, suspension.user_id, suspension.id)
         
         if expired_suspensions:
-            print(f"✅ Reactivated {len(expired_suspensions)} users")
+            print(f" Reactivated {len(expired_suspensions)} users")
         
     except Exception as e:
-        print(f"❌ Error checking expired suspensions: {e}")
+        print(f" Error checking expired suspensions: {e}")
         db.rollback()
 
 def reactivate_user(db: Session, user_id: int, suspension_id: int):
     """
-    Réactiver un utilisateur après la fin de la suspension
+    Ractiver un utilisateur aprs la fin de la suspension
     """
     try:
         suspension = db.query(UserSuspension).filter(UserSuspension.id == suspension_id).first()
@@ -206,10 +206,10 @@ def reactivate_user(db: Session, user_id: int, suspension_id: int):
         if not suspension or not user:
             return
         
-        # Réactiver la suspension
+        # Ractiver la suspension
         suspension.reactivate()
         
-        # Réactiver l'utilisateur
+        # Ractiver l'utilisateur
         user.is_active = True
         
         db.commit()
@@ -220,12 +220,12 @@ def reactivate_user(db: Session, user_id: int, suspension_id: int):
         try:
             send_account_reactivation_notice(user.email, user.username)
         except Exception as e:
-            print(f"⚠️ Failed to send reactivation email: {e}")
+            print(f" Failed to send reactivation email: {e}")
         
-        print(f"✅ User {user.username} reactivated")
+        print(f" User {user.username} reactivated")
         
     except Exception as e:
-        print(f"❌ Error reactivating user: {e}")
+        print(f" Error reactivating user: {e}")
         db.rollback()
 
 def get_user_suspension_status(db: Session, user_id: int) -> dict:
@@ -244,7 +244,7 @@ def get_user_suspension_status(db: Session, user_id: int) -> dict:
                 "suspension": None
             }
         
-        # Vérifier si expirée
+        # Vrifier si expire
         if active_suspension.is_expired():
             reactivate_user(db, user_id, active_suspension.id)
             return {
@@ -266,7 +266,7 @@ def get_user_suspension_status(db: Session, user_id: int) -> dict:
         }
         
     except Exception as e:
-        print(f"❌ Error getting suspension status: {e}")
+        print(f" Error getting suspension status: {e}")
         return {
             "is_suspended": False,
             "suspension": None

@@ -16,7 +16,7 @@ curriculum_books = Table(
 class Curriculum(Base):
     """
     Table pour stocker les cursus universitaires
-    Ex: "L1 Informatique USTHB", "1ère Année Médecine Université d'Alger"
+    Ex: "L1 Informatique USTHB", "1re Anne Mdecine Universit d'Alger"
     """
     __tablename__ = "curriculums"
 
@@ -24,7 +24,7 @@ class Curriculum(Base):
     name = Column(String, nullable=False, unique=True)  # "L1 Informatique USTHB"
     university = Column(String, nullable=False)  # "USTHB"
     field = Column(String, nullable=False)  # "Informatique"
-    year = Column(String, nullable=False)  # "1ère année" ou "L1"
+    year = Column(String, nullable=False)  # "1re anne" ou "L1"
     description = Column(Text, nullable=True)
     source_url = Column(String, nullable=True)  # URL de la source du scraping
     created_at = Column(DateTime(timezone=True), server_default=func.now())
@@ -44,7 +44,7 @@ class Curriculum(Base):
 
 class RecommendedBook(Base):
     """
-    Table pour stocker les livres recommandés (issus du scraping)
+    Table pour stocker les livres recommands (issus du scraping)
     """
     __tablename__ = "recommended_books"
 
@@ -54,7 +54,7 @@ class RecommendedBook(Base):
     isbn = Column(String, nullable=True, index=True)  # Si disponible
     publisher = Column(String, nullable=True)
     edition = Column(String, nullable=True)
-    source_url = Column(String, nullable=True)  # URL d'où vient l'info
+    source_url = Column(String, nullable=True)  # URL d'o vient l'info
     scraped_at = Column(DateTime(timezone=True), server_default=func.now())
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
@@ -72,8 +72,8 @@ class RecommendedBook(Base):
 
 class BookCurriculumMatch(Base):
     """
-    Table pour lier les livres de la plateforme aux livres recommandés
-    Permet de savoir si un Book est recommandé pour un cursus
+    Table pour lier les livres de la plateforme aux livres recommands
+    Permet de savoir si un Book est recommand pour un cursus
     """
     __tablename__ = "book_curriculum_matches"
 
@@ -82,7 +82,7 @@ class BookCurriculumMatch(Base):
     recommended_book_id = Column(Integer, ForeignKey("recommended_books.id", ondelete="CASCADE"), nullable=False)
     match_score = Column(Integer, default=100)  # Score de correspondance (0-100)
     match_method = Column(String, nullable=True)  # "isbn", "title_exact", "title_fuzzy"
-    verified = Column(Integer, default=False)  # Vérifié manuellement
+    verified = Column(Integer, default=False)  # Vrifi manuellement
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     # Relations

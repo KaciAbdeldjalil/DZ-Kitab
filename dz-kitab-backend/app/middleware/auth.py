@@ -23,7 +23,7 @@ class JWTBearer(HTTPBearer):
                     detail="Invalid token or expired token."
                 )
             
-            # Stocker les infos utilisateur dans la requête
+            # Stocker les infos utilisateur dans la requte
             request.state.user = payload
             return credentials.credentials
         else:

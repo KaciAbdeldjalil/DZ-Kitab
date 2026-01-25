@@ -1,8 +1,8 @@
 # app/scripts/scrape_curriculum_books.py
 
 """
-Script de web scraping pour récupérer les listes de livres recommandés
-pour différents cursus universitaires algériens.
+Script de web scraping pour rcuprer les listes de livres recommands
+pour diffrents cursus universitaires algriens.
 
 Usage:
     python -m app.scripts.scrape_curriculum_books
@@ -17,7 +17,7 @@ from typing import List, Dict
 import time
 from datetime import datetime
 
-# Ajouter le répertoire parent au path
+# Ajouter le rpertoire parent au path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from sqlalchemy.orm import Session
@@ -29,29 +29,29 @@ HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
 }
 
-# URLs à scraper (exemples - à adapter selon les sources réelles)
+# URLs  scraper (exemples -  adapter selon les sources relles)
 SOURCES = [
     {
         "name": "L1 Informatique USTHB",
         "university": "USTHB",
         "field": "Informatique",
-        "year": "1ère année",
+        "year": "1re anne",
         "url": "https://www.usthb.dz/fei/programmes/l1-informatique",  # URL fictive
-        "selector": ".book-list .book-item"  # Sélecteur CSS fictif
+        "selector": ".book-list .book-item"  # Slecteur CSS fictif
     },
     {
-        "name": "1ère Année Médecine Université d'Alger",
-        "university": "Université d'Alger 1",
-        "field": "Médecine",
-        "year": "1ère année",
+        "name": "1re Anne Mdecine Universit d'Alger",
+        "university": "Universit d'Alger 1",
+        "field": "Mdecine",
+        "year": "1re anne",
         "url": "https://www.univ-alger.dz/medecine/1ere-annee",  # URL fictive
         "selector": ".recommended-books .book"
     },
     {
-        "name": "L1 Mathématiques USTHB",
+        "name": "L1 Mathmatiques USTHB",
         "university": "USTHB",
-        "field": "Mathématiques",
-        "year": "1ère année",
+        "field": "Mathmatiques",
+        "year": "1re anne",
         "url": "https://www.usthb.dz/fs/maths/l1",  # URL fictive
         "selector": ".course-books li"
     }
@@ -60,18 +60,18 @@ SOURCES = [
 
 def scrape_usthb_informatique() -> List[Dict]:
     """
-    Scraper spécifique pour USTHB Informatique
-    À adapter selon la structure réelle du site
+    Scraper spcifique pour USTHB Informatique
+     adapter selon la structure relle du site
     """
     books = []
     
-    # Exemple de données hardcodées (à remplacer par du vrai scraping)
+    # Exemple de donnes hardcodes ( remplacer par du vrai scraping)
     sample_books = [
-        {"title": "Algorithmique et structures de données", "author": "Thomas H. Cormen"},
-        {"title": "Introduction à Python", "author": "Gérard Swinnen"},
+        {"title": "Algorithmique et structures de donnes", "author": "Thomas H. Cormen"},
+        {"title": "Introduction  Python", "author": "Grard Swinnen"},
         {"title": "Architecture des ordinateurs", "author": "Andrew S. Tanenbaum"},
-        {"title": "Mathématiques pour l'informatique", "author": "Donald Knuth"},
-        {"title": "Systèmes d'exploitation", "author": "Abraham Silberschatz"}
+        {"title": "Mathmatiques pour l'informatique", "author": "Donald Knuth"},
+        {"title": "Systmes d'exploitation", "author": "Abraham Silberschatz"}
     ]
     
     return sample_books
@@ -79,12 +79,12 @@ def scrape_usthb_informatique() -> List[Dict]:
 
 def scrape_medecine_alger() -> List[Dict]:
     """
-    Scraper spécifique pour Médecine Alger
+    Scraper spcifique pour Mdecine Alger
     """
     books = [
         {"title": "Anatomie humaine", "author": "Frank H. Netter"},
-        {"title": "Physiologie médicale", "author": "Guyton et Hall"},
-        {"title": "Biochimie médicale", "author": "Harper"},
+        {"title": "Physiologie mdicale", "author": "Guyton et Hall"},
+        {"title": "Biochimie mdicale", "author": "Harper"},
         {"title": "Histologie", "author": "Ross et Pawlina"},
         {"title": "Embryologie humaine", "author": "Larsen"}
     ]
@@ -94,14 +94,14 @@ def scrape_medecine_alger() -> List[Dict]:
 
 def scrape_maths_usthb() -> List[Dict]:
     """
-    Scraper spécifique pour Mathématiques USTHB
+    Scraper spcifique pour Mathmatiques USTHB
     """
     books = [
-        {"title": "Analyse mathématique I", "author": "Vladimir Zorich"},
-        {"title": "Algèbre linéaire", "author": "Serge Lang"},
-        {"title": "Topologie générale", "author": "James Munkres"},
-        {"title": "Probabilités et statistiques", "author": "Sheldon Ross"},
-        {"title": "Calcul différentiel", "author": "Michael Spivak"}
+        {"title": "Analyse mathmatique I", "author": "Vladimir Zorich"},
+        {"title": "Algbre linaire", "author": "Serge Lang"},
+        {"title": "Topologie gnrale", "author": "James Munkres"},
+        {"title": "Probabilits et statistiques", "author": "Sheldon Ross"},
+        {"title": "Calcul diffrentiel", "author": "Michael Spivak"}
     ]
     
     return books
@@ -109,11 +109,11 @@ def scrape_maths_usthb() -> List[Dict]:
 
 def scrape_generic(url: str, selector: str) -> List[Dict]:
     """
-    Scraper générique pour n'importe quelle page
+    Scraper gnrique pour n'importe quelle page
     
     Args:
-        url: URL de la page à scraper
-        selector: Sélecteur CSS pour trouver les livres
+        url: URL de la page  scraper
+        selector: Slecteur CSS pour trouver les livres
     
     Returns:
         Liste de dictionnaires avec titre et auteur
@@ -128,7 +128,7 @@ def scrape_generic(url: str, selector: str) -> List[Dict]:
         book_elements = soup.select(selector)
         
         for element in book_elements:
-            # Adapter selon la structure HTML réelle
+            # Adapter selon la structure HTML relle
             title = element.select_one('.title, h3, .book-title')
             author = element.select_one('.author, .book-author')
             
@@ -142,21 +142,21 @@ def scrape_generic(url: str, selector: str) -> List[Dict]:
         return books
         
     except Exception as e:
-        print(f"❌ Erreur lors du scraping de {url}: {e}")
+        print(f" Erreur lors du scraping de {url}: {e}")
         return []
 
 
 def save_curriculum_books(db: Session, curriculum_data: Dict, books: List[Dict]):
     """
-    Sauvegarder le cursus et ses livres dans la base de données
+    Sauvegarder le cursus et ses livres dans la base de donnes
     
     Args:
-        db: Session de base de données
-        curriculum_data: Données du cursus
-        books: Liste des livres recommandés
+        db: Session de base de donnes
+        curriculum_data: Donnes du cursus
+        books: Liste des livres recommands
     """
     try:
-        # Créer ou récupérer le cursus
+        # Crer ou rcuprer le cursus
         curriculum = db.query(Curriculum).filter(
             Curriculum.name == curriculum_data["name"]
         ).first()
@@ -172,11 +172,11 @@ def save_curriculum_books(db: Session, curriculum_data: Dict, books: List[Dict])
             db.add(curriculum)
             db.flush()
         
-        print(f"✅ Cursus: {curriculum.name}")
+        print(f" Cursus: {curriculum.name}")
         
         # Ajouter les livres
         for book_data in books:
-            # Vérifier si le livre existe déjà
+            # Vrifier si le livre existe dj
             existing_book = db.query(RecommendedBook).filter(
                 RecommendedBook.title == book_data["title"],
                 RecommendedBook.author == book_data.get("author")
@@ -198,65 +198,65 @@ def save_curriculum_books(db: Session, curriculum_data: Dict, books: List[Dict])
             if recommended_book not in curriculum.recommended_books:
                 curriculum.recommended_books.append(recommended_book)
             
-            print(f"  📚 {book_data['title']} - {book_data.get('author', 'Auteur inconnu')}")
+            print(f"   {book_data['title']} - {book_data.get('author', 'Auteur inconnu')}")
         
         db.commit()
-        print(f"✅ {len(books)} livres ajoutés pour {curriculum.name}\n")
+        print(f" {len(books)} livres ajouts pour {curriculum.name}\n")
         
     except Exception as e:
-        print(f"❌ Erreur lors de la sauvegarde: {e}")
+        print(f" Erreur lors de la sauvegarde: {e}")
         db.rollback()
 
 
 def run_scraping():
     """
-    Fonction principale d'exécution du scraping
+    Fonction principale d'excution du scraping
     """
     print("\n" + "="*60)
-    print("🕷️  SCRAPING DES LISTES DE LIVRES RECOMMANDÉS")
+    print("  SCRAPING DES LISTES DE LIVRES RECOMMANDS")
     print("="*60 + "\n")
     
     db = SessionLocal()
     
     try:
         # 1. USTHB Informatique
-        print("🔍 Scraping: L1 Informatique USTHB...")
+        print(" Scraping: L1 Informatique USTHB...")
         books = scrape_usthb_informatique()
         save_curriculum_books(db, {
             "name": "L1 Informatique USTHB",
             "university": "USTHB",
             "field": "Informatique",
-            "year": "1ère année"
+            "year": "1re anne"
         }, books)
         time.sleep(1)
         
-        # 2. Médecine Alger
-        print("🔍 Scraping: 1ère Année Médecine Université d'Alger...")
+        # 2. Mdecine Alger
+        print(" Scraping: 1re Anne Mdecine Universit d'Alger...")
         books = scrape_medecine_alger()
         save_curriculum_books(db, {
-            "name": "1ère Année Médecine Université d'Alger",
-            "university": "Université d'Alger 1",
-            "field": "Médecine",
-            "year": "1ère année"
+            "name": "1re Anne Mdecine Universit d'Alger",
+            "university": "Universit d'Alger 1",
+            "field": "Mdecine",
+            "year": "1re anne"
         }, books)
         time.sleep(1)
         
-        # 3. Mathématiques USTHB
-        print("🔍 Scraping: L1 Mathématiques USTHB...")
+        # 3. Mathmatiques USTHB
+        print(" Scraping: L1 Mathmatiques USTHB...")
         books = scrape_maths_usthb()
         save_curriculum_books(db, {
-            "name": "L1 Mathématiques USTHB",
+            "name": "L1 Mathmatiques USTHB",
             "university": "USTHB",
-            "field": "Mathématiques",
-            "year": "1ère année"
+            "field": "Mathmatiques",
+            "year": "1re anne"
         }, books)
         
         print("\n" + "="*60)
-        print("✅ SCRAPING TERMINÉ AVEC SUCCÈS")
+        print(" SCRAPING TERMIN AVEC SUCCS")
         print("="*60 + "\n")
         
     except Exception as e:
-        print(f"\n❌ Erreur globale: {e}")
+        print(f"\n Erreur globale: {e}")
         db.rollback()
         
     finally:

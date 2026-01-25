@@ -6,22 +6,22 @@ from typing import Optional
 
 def notify_new_rating(db: Session, rating: Rating):
     """
-    Créer une notification quand un vendeur reçoit une nouvelle note
+    Crer une notification quand un vendeur reoit une nouvelle note
     """
     try:
         seller = db.query(User).filter(User.id == rating.seller_id).first()
         buyer = db.query(User).filter(User.id == rating.buyer_id).first()
         
         if not seller or not buyer:
-            print(f"⚠️ Utilisateur non trouvé pour la notification")
+            print(f" Utilisateur non trouv pour la notification")
             return
         
-        # Créer la notification
+        # Crer la notification
         notification = Notification(
             user_id=rating.seller_id,
             type=NotificationType.NEW_RATING,
             title=f"Nouvelle note de {buyer.username}",
-            message=f"{buyer.username} vous a donné {rating.rating} étoiles" + (f": {rating.comment[:50]}..." if rating.comment else ""),
+            message=f"{buyer.username} vous a donn {rating.rating} toiles" + (f": {rating.comment[:50]}..." if rating.comment else ""),
             related_user_id=rating.buyer_id,
             related_announcement_id=rating.announcement_id,
             related_rating_id=rating.id,
@@ -31,10 +31,10 @@ def notify_new_rating(db: Session, rating: Rating):
         db.add(notification)
         db.commit()
         
-        print(f"✅ Notification créée pour le vendeur {seller.username}")
+        print(f" Notification cre pour le vendeur {seller.username}")
         
     except Exception as e:
-        print(f"❌ Erreur création notification: {e}")
+        print(f" Erreur cration notification: {e}")
         db.rollback()
 
 
@@ -50,18 +50,18 @@ def notify_low_rating_alert(db: Session, seller_id: int, low_rating_count: int, 
         notification = Notification(
             user_id=seller_id,
             type=NotificationType.LOW_RATING_ALERT,
-            title="⚠️ Alerte: Notes basses",
-            message=f"Vous avez {low_rating_count} notes de 1 étoile. Votre moyenne est de {average_rating:.1f}/5.0",
+            title=" Alerte: Notes basses",
+            message=f"Vous avez {low_rating_count} notes de 1 toile. Votre moyenne est de {average_rating:.1f}/5.0",
             action_url="/profile/ratings"
         )
         
         db.add(notification)
         db.commit()
         
-        print(f"⚠️ Alerte notes basses envoyée à {seller.username}")
+        print(f" Alerte notes basses envoye  {seller.username}")
         
     except Exception as e:
-        print(f"❌ Erreur alerte notes basses: {e}")
+        print(f" Erreur alerte notes basses: {e}")
         db.rollback()
 
 
@@ -77,7 +77,7 @@ def notify_account_suspended(db: Session, seller_id: int, suspension_end_date: s
         notification = Notification(
             user_id=seller_id,
             type=NotificationType.ACCOUNT_SUSPENDED,
-            title="🚫 Compte Suspendu",
+            title=" Compte Suspendu",
             message=f"Votre compte est suspendu jusqu'au {suspension_end_date}",
             action_url="/profile/suspension"
         )
@@ -85,16 +85,16 @@ def notify_account_suspended(db: Session, seller_id: int, suspension_end_date: s
         db.add(notification)
         db.commit()
         
-        print(f"🚫 Notification suspension envoyée à {seller.username}")
+        print(f" Notification suspension envoye  {seller.username}")
         
     except Exception as e:
-        print(f"❌ Erreur notification suspension: {e}")
+        print(f" Erreur notification suspension: {e}")
         db.rollback()
 
 
 def notify_account_reactivated(db: Session, seller_id: int):
     """
-    Notifier le vendeur que son compte est réactivé
+    Notifier le vendeur que son compte est ractiv
     """
     try:
         seller = db.query(User).filter(User.id == seller_id).first()
@@ -104,16 +104,16 @@ def notify_account_reactivated(db: Session, seller_id: int):
         notification = Notification(
             user_id=seller_id,
             type=NotificationType.ACCOUNT_REACTIVATED,
-            title="✅ Compte Réactivé",
-            message="Votre compte a été réactivé avec succès. Vous pouvez à nouveau publier des annonces.",
+            title=" Compte Ractiv",
+            message="Votre compte a t ractiv avec succs. Vous pouvez  nouveau publier des annonces.",
             action_url="/dashboard"
         )
         
         db.add(notification)
         db.commit()
         
-        print(f"✅ Notification réactivation envoyée à {seller.username}")
+        print(f" Notification ractivation envoye  {seller.username}")
         
     except Exception as e:
-        print(f"❌ Erreur notification réactivation: {e}")
+        print(f" Erreur notification ractivation: {e}")
         db.rollback()

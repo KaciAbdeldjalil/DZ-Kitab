@@ -1,8 +1,8 @@
 # app/cron/reactive_accounts.py
 
 """
-Cron job pour réactiver automatiquement les comptes suspendus
-À exécuter quotidiennement (par exemple à 2h du matin)
+Cron job pour ractiver automatiquement les comptes suspendus
+ excuter quotidiennement (par exemple  2h du matin)
 
 Configuration crontab:
 0 2 * * * cd /app && python -m app.cron.reactive_accounts
@@ -12,7 +12,7 @@ import sys
 import os
 from pathlib import Path
 
-# Ajouter le répertoire parent au path
+# Ajouter le rpertoire parent au path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from sqlalchemy.orm import Session
@@ -22,23 +22,23 @@ from datetime import datetime
 
 def run_reactivation_job():
     """
-    Tâche principale: vérifier et réactiver les comptes dont la suspension a expiré
+    Tche principale: vrifier et ractiver les comptes dont la suspension a expir
     """
     print(f"\n{'='*60}")
-    print(f"🕐 Démarrage du job de réactivation: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f" Dmarrage du job de ractivation: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"{'='*60}\n")
     
     db: Session = SessionLocal()
     
     try:
-        # Vérifier les suspensions expirées
-        print("🔍 Vérification des suspensions expirées...")
+        # Vrifier les suspensions expires
+        print(" Vrification des suspensions expires...")
         check_expired_suspensions(db)
         
-        print(f"\n✅ Job terminé avec succès: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        print(f"\n Job termin avec succs: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         
     except Exception as e:
-        print(f"❌ Erreur lors de l'exécution du job: {e}")
+        print(f" Erreur lors de l'excution du job: {e}")
         import traceback
         traceback.print_exc()
         

@@ -34,7 +34,7 @@ def get_current_user_id(token: str = Depends(security), db: Session = Depends(ge
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Utilisateur non trouvé"
+            detail="Utilisateur non trouv"
         )
     
     return user.id
@@ -48,37 +48,37 @@ def evaluate_book_condition(
     user_id: int = Depends(get_current_user_id)
 ):
     """
-    Évaluer l'état du livre et calculer le prix final
+    valuer l'tat du livre et calculer le prix final
     
-    - Répond à 15 questions réparties en 5 catégories
+    - Rpond  15 questions rparties en 5 catgories
     - Calcule automatiquement le score global (0-100%)
-    - Calcule le prix final: market_price × (overall_score / 100)
+    - Calcule le prix final: market_price  (overall_score / 100)
     """
-    # Vérifier que l'annonce existe et appartient à l'utilisateur
+    # Vrifier que l'annonce existe et appartient  l'utilisateur
     announcement = db.query(Announcement).filter(Announcement.id == announcement_id).first()
     
     if not announcement:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Annonce non trouvée"
+            detail="Annonce non trouve"
         )
     
     if announcement.user_id != user_id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Vous n'êtes pas autorisé à évaluer cette annonce"
+            detail="Vous n'tes pas autoris  valuer cette annonce"
         )
     
-    # Vérifier si une évaluation existe déjà
+    # Vrifier si une valuation existe dj
     existing_score = db.query(BookConditionScore).filter(
         BookConditionScore.announcement_id == announcement_id
     ).first()
     
     if existing_score:
-        # Mettre à jour l'évaluation existante
+        # Mettre  jour l'valuation existante
         condition_score = existing_score
     else:
-        # Créer une nouvelle évaluation
+        # Crer une nouvelle valuation
         condition_score = BookConditionScore(announcement_id=announcement_id)
     
     # Page Score
@@ -124,7 +124,7 @@ def evaluate_book_condition(
         condition_score.base_price = market_price
         condition_score.suggested_price = final_price
         
-        # Mettre à jour l'annonce avec le prix calculé
+        # Mettre  jour l'annonce avec le prix calcul
         announcement.market_price = market_price
         announcement.final_calculated_price = final_price
     
@@ -136,7 +136,7 @@ def evaluate_book_condition(
     db.refresh(condition_score)
     db.refresh(announcement)
     
-    # Calculer le multiplicateur pour la réponse
+    # Calculer le multiplicateur pour la rponse
     multiplier = None
     if condition_score.base_price and condition_score.suggested_price:
         multiplier = round(condition_score.suggested_price / condition_score.base_price, 2)
@@ -166,14 +166,14 @@ def get_condition_score(
     db: Session = Depends(get_db)
 ):
     """
-    Récupérer le score d'évaluation d'une annonce (public)
+    Rcuprer le score d'valuation d'une annonce (public)
     """
     announcement = db.query(Announcement).filter(Announcement.id == announcement_id).first()
     
     if not announcement:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Annonce non trouvée"
+            detail="Annonce non trouve"
         )
     
     condition_score = db.query(BookConditionScore).filter(
@@ -183,7 +183,7 @@ def get_condition_score(
     if not condition_score:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Aucune évaluation trouvée pour cette annonce"
+            detail="Aucune valuation trouve pour cette annonce"
         )
     
     multiplier = None
@@ -215,14 +215,14 @@ def get_condition_summary(
     db: Session = Depends(get_db)
 ):
     """
-    Récupérer un résumé visuel de l'état du livre avec recommandations
+    Rcuprer un rsum visuel de l'tat du livre avec recommandations
     """
     announcement = db.query(Announcement).filter(Announcement.id == announcement_id).first()
     
     if not announcement:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Annonce non trouvée"
+            detail="Annonce non trouve"
         )
     
     condition_score = db.query(BookConditionScore).filter(
@@ -232,10 +232,10 @@ def get_condition_summary(
     if not condition_score:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Aucune évaluation trouvée pour cette annonce"
+            detail="Aucune valuation trouve pour cette annonce"
         )
     
-    # Créer le breakdown détaillé
+    # Crer le breakdown dtaill
     breakdown = {
         "pages": ScoreBreakdown(
             score=condition_score.page_score,
@@ -267,7 +267,7 @@ def get_condition_summary(
             ]),
             total_checks=3
         ),
-        "dégâts": ScoreBreakdown(
+        "dgts": ScoreBreakdown(
             score=condition_score.damage_score,
             percentage=condition_score.damage_score,
             checks_passed=sum([
@@ -289,29 +289,29 @@ def get_condition_summary(
         )
     }
     
-    # Générer des recommandations
+    # Gnrer des recommandations
     recommendations = []
     if condition_score.page_score < 80:
         recommendations.append("Les pages montrent des signes d'usure")
     if condition_score.binding_score < 80:
-        recommendations.append("La reliure nécessite une attention")
+        recommendations.append("La reliure ncessite une attention")
     if condition_score.cover_score < 80:
-        recommendations.append("La couverture présente des imperfections")
+        recommendations.append("La couverture prsente des imperfections")
     if not condition_score.has_photos:
         recommendations.append("Ajoutez des photos pour augmenter vos chances de vente de 3x!")
     if condition_score.overall_score >= 90:
-        recommendations.append("Excellent état! Ce livre se vendra rapidement")
+        recommendations.append("Excellent tat! Ce livre se vendra rapidement")
     
     # Impact sur le prix
     if announcement.final_calculated_price and announcement.market_price:
         diff = announcement.market_price - announcement.final_calculated_price
         percentage = (diff / announcement.market_price) * 100
         if percentage > 0:
-            price_impact = f"Prix réduit de {percentage:.0f}% en raison de l'état"
+            price_impact = f"Prix rduit de {percentage:.0f}% en raison de l'tat"
         else:
-            price_impact = f"Prix à {abs(percentage):.0f}% du prix du marché"
+            price_impact = f"Prix  {abs(percentage):.0f}% du prix du march"
     else:
-        price_impact = "Prix basé sur l'état global"
+        price_impact = "Prix bas sur l'tat global"
     
     return ConditionSummary(
         overall_score=condition_score.overall_score,
@@ -330,15 +330,15 @@ def suggest_price(
     db: Session = Depends(get_db)
 ):
     """
-    Obtenir une suggestion de prix basée sur l'évaluation existante
-    Prix final = market_price × (overall_score / 100)
+    Obtenir une suggestion de prix base sur l'valuation existante
+    Prix final = market_price  (overall_score / 100)
     """
     announcement = db.query(Announcement).filter(Announcement.id == announcement_id).first()
     
     if not announcement:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Annonce non trouvée"
+            detail="Annonce non trouve"
         )
     
     condition_score = db.query(BookConditionScore).filter(
@@ -348,14 +348,14 @@ def suggest_price(
     if not condition_score:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Aucune évaluation trouvée. Veuillez d'abord évaluer le livre."
+            detail="Aucune valuation trouve. Veuillez d'abord valuer le livre."
         )
     
     # Calculer le prix final
     final_calculated_price = round(market_price * (condition_score.overall_score / 100), 2)
     multiplier = round(condition_score.overall_score / 100, 2)
     
-    # Mettre à jour les prix
+    # Mettre  jour les prix
     condition_score.base_price = market_price
     condition_score.suggested_price = final_calculated_price
     announcement.market_price = market_price
@@ -363,7 +363,7 @@ def suggest_price(
     
     db.commit()
     
-    # Créer le breakdown du calcul
+    # Crer le breakdown du calcul
     price_breakdown = {
         "market_price": market_price,
         "condition_score_percentage": condition_score.overall_score,
@@ -378,5 +378,5 @@ def suggest_price(
         final_calculated_price=final_calculated_price,
         condition_label=condition_score.condition_label,
         price_breakdown=price_breakdown,
-        message=f"Prix suggéré basé sur un état '{condition_score.condition_label}' (score: {condition_score.overall_score:.1f}%)"
+        message=f"Prix suggr bas sur un tat '{condition_score.condition_label}' (score: {condition_score.overall_score:.1f}%)"
     )

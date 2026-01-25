@@ -38,7 +38,7 @@ def get_current_user_id(token: str = Depends(security), db: Session = Depends(ge
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Utilisateur non trouvé"
+            detail="Utilisateur non trouv"
         )
     
     return user.id
@@ -51,7 +51,7 @@ def get_current_user_id(token: str = Depends(security), db: Session = Depends(ge
 @router.get("/categories", response_model=List[str])
 def get_categories():
     """
-    Obtenir la liste de toutes les catégories disponibles
+    Obtenir la liste de toutes les catgories disponibles
     """
     return [category.value for category in BookCategoryEnum]
 
@@ -68,12 +68,12 @@ async def test_isbn_lookup():
     """
     mock_book = GoogleBookInfo(
         isbn="9782100545476",
-        title="Mathématiques pour l'ingénieur",
-        subtitle="Rappels de cours et exercices corrigés",
-        authors=["Jean-Pierre Ramis", "André Warusfel"],
+        title="Mathmatiques pour l'ingnieur",
+        subtitle="Rappels de cours et exercices corrigs",
+        authors=["Jean-Pierre Ramis", "Andr Warusfel"],
         publisher="Dunod",
         published_date="2009",
-        description="Cet ouvrage présente les bases mathématiques indispensables aux futurs ingénieurs...",
+        description="Cet ouvrage prsente les bases mathmatiques indispensables aux futurs ingnieurs...",
         page_count=542,
         categories=["Mathematics", "Engineering"],
         language="fr",
@@ -85,7 +85,7 @@ async def test_isbn_lookup():
     return ISBNLookupResponse(
         found=True,
         book_info=mock_book,
-        message="Données de test (Google Books API indisponible)"
+        message="Donnes de test (Google Books API indisponible)"
     )
 
 
@@ -107,7 +107,7 @@ async def lookup_isbn(isbn: str):
         if not book_info:
             return ISBNLookupResponse(
                 found=False,
-                message=f"Aucun livre trouvé pour l'ISBN: {isbn}. Vérifiez que l'ISBN est correct ou essayez un autre ISBN. Exemples d'ISBN valides : 9780439708180 (Harry Potter), 9782070612758 (Le Petit Prince)"
+                message=f"Aucun livre trouv pour l'ISBN: {isbn}. Vrifiez que l'ISBN est correct ou essayez un autre ISBN. Exemples d'ISBN valides : 9780439708180 (Harry Potter), 9782070612758 (Le Petit Prince)"
             )
         
         return ISBNLookupResponse(
@@ -118,7 +118,7 @@ async def lookup_isbn(isbn: str):
     except HTTPException:
         raise
     except Exception as e:
-        print(f"❌ Error in ISBN lookup: {e}")
+        print(f" Error in ISBN lookup: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Erreur lors de la recherche du livre"
@@ -144,8 +144,8 @@ async def create_announcement(
     3. Creates the announcement with category, page count, publication date
     """
     try:
-        print(f"📖 Creating announcement for ISBN: {announcement_data.isbn}")
-        print(f"📦 Data: {announcement_data.dict(exclude={'custom_images'})}")
+        print(f" Creating announcement for ISBN: {announcement_data.isbn}")
+        print(f" Data: {announcement_data.dict(exclude={'custom_images'})}")
         
         # 1. Fetch book info from Web Scraping
         book_info = await fetch_book_by_isbn_scraping(announcement_data.isbn)
@@ -160,7 +160,7 @@ async def create_announcement(
                 if not announcement_data.title:
                     raise HTTPException(
                         status_code=status.HTTP_404_NOT_FOUND,
-                        detail=f"Aucun livre trouvé pour l'ISBN: {announcement_data.isbn}. Veuillez fournir le titre et l'auteur manuellement."
+                        detail=f"Aucun livre trouv pour l'ISBN: {announcement_data.isbn}. Veuillez fournir le titre et l'auteur manuellement."
                     )
                 
                 # Create new book entry from manual data
@@ -276,12 +276,12 @@ async def create_announcement(
         raise
     except Exception as e:
         import traceback
-        print(f"❌ Error creating announcement: {e}")
+        print(f" Error creating announcement: {e}")
         traceback.print_exc()
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Erreur lors de la création de l'annonce: {str(e)}"
+            detail=f"Erreur lors de la cration de l'annonce: {str(e)}"
         )
 
 
@@ -375,10 +375,10 @@ def get_announcements(
         )
         
     except Exception as e:
-        print(f"❌ Error fetching announcements: {e}")
+        print(f" Error fetching announcements: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Erreur lors de la récupération des annonces"
+            detail="Erreur lors de la rcupration des annonces"
         )
 
 
@@ -390,7 +390,7 @@ def get_announcement(announcement_id: int, db: Session = Depends(get_db)):
     if not announcement:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Annonce non trouvée"
+            detail="Annonce non trouve"
         )
     
     # Increment view count
@@ -491,14 +491,14 @@ def update_announcement(
     if not announcement:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Annonce non trouvée"
+            detail="Annonce non trouve"
         )
     
     # Check ownership
     if announcement.user_id != user_id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Vous n'êtes pas autorisé à modifier cette annonce"
+            detail="Vous n'tes pas autoris  modifier cette annonce"
         )
     
     # Update fields
@@ -545,12 +545,12 @@ def update_announcement(
         id=announcement.id,
         book_id=announcement.book_id,
         user_id=announcement.user_id,
-        category=announcement.category.value if announcement.category else None,  # ✅ Sécurisé
+        category=announcement.category.value if announcement.category else None,  #  Scuris
         price=announcement.price,
         market_price=announcement.market_price,
         final_calculated_price=announcement.final_calculated_price,
-        condition=announcement.condition.value if announcement.condition else None,  # ✅ Sécurisé
-        status=announcement.status.value if announcement.status else None,  # ✅ Sécurisé
+        condition=announcement.condition.value if announcement.condition else None,  #  Scuris
+        status=announcement.status.value if announcement.status else None,  #  Scuris
         description=announcement.description,
         custom_images=announcement.custom_images,
         location=announcement.location,
@@ -581,14 +581,14 @@ def delete_announcement(
     if not announcement:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Annonce non trouvée"
+            detail="Annonce non trouve"
         )
     
     # Check ownership
     if announcement.user_id != user_id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Vous n'êtes pas autorisé à supprimer cette annonce"
+            detail="Vous n'tes pas autoris  supprimer cette annonce"
         )
     
     try:
@@ -596,12 +596,12 @@ def delete_announcement(
         db.commit()
         
         return {
-            "message": "Annonce supprimée avec succès",
+            "message": "Annonce supprime avec succs",
             "announcement_id": announcement_id
         }
     except Exception as e:
         db.rollback()
-        print(f"❌ Error deleting announcement: {e}")
+        print(f" Error deleting announcement: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Erreur lors de la suppression de l'annonce"

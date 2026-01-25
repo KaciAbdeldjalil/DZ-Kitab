@@ -9,7 +9,7 @@ from app.schemas.book import AnnouncementResponse
 router = APIRouter()
 
 def format_announcement_response(announcement: Announcement, db: Session) -> AnnouncementResponse:
-    """Helper pour formater une annonce en réponse"""
+    """Helper pour formater une annonce en rponse"""
     book = db.query(Book).filter(Book.id == announcement.book_id).first()
     user = db.query(User).filter(User.id == announcement.user_id).first()
     
@@ -46,18 +46,18 @@ def get_same_domain_recommendations(
     db: Session = Depends(get_db)
 ):
     """
-    🎯 Obtenir les recommandations pour une annonce
+     Obtenir les recommandations pour une annonce
     
-    **Condition**: Recommande uniquement les livres du MÊME DOMAINE (catégorie)
+    **Condition**: Recommande uniquement les livres du MME DOMAINE (catgorie)
     
-    **Paramètres**:
+    **Paramtres**:
     - **announcement_id**: ID de l'annonce actuelle
-    - **limit**: Nombre de recommandations (par défaut: 4)
+    - **limit**: Nombre de recommandations (par dfaut: 4)
     
-    **Retourne**: Liste de livres de la même catégorie
+    **Retourne**: Liste de livres de la mme catgorie
     """
     try:
-        # 1. Récupérer l'annonce actuelle
+        # 1. Rcuprer l'annonce actuelle
         current_announcement = db.query(Announcement).filter(
             Announcement.id == announcement_id
         ).first()
@@ -65,24 +65,24 @@ def get_same_domain_recommendations(
         if not current_announcement:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Annonce non trouvée"
+                detail="Annonce non trouve"
             )
         
-        # 2. Extraire la catégorie
+        # 2. Extraire la catgorie
         category = current_announcement.category.value if hasattr(
             current_announcement.category, 'value'
         ) else current_announcement.category
         
-        # 3. Chercher les annonces de la MÊME catégorie
+        # 3. Chercher les annonces de la MME catgorie
         recommendations = db.query(Announcement).filter(
-            Announcement.category == category,           # ✅ MÊME DOMAINE
-            Announcement.id != announcement_id,          # ✅ Exclure l'annonce actuelle
-            Announcement.status == "Active"              # ✅ Seulement les actives
+            Announcement.category == category,           #  MME DOMAINE
+            Announcement.id != announcement_id,          #  Exclure l'annonce actuelle
+            Announcement.status == "Active"              #  Seulement les actives
         ).order_by(
-            Announcement.created_at.desc()               # ✅ Les plus récentes en premier
+            Announcement.created_at.desc()               #  Les plus rcentes en premier
         ).limit(limit).all()
         
-        # 4. Formater les réponses
+        # 4. Formater les rponses
         formatted_recommendations = [
             format_announcement_response(ann, db)
             for ann in recommendations
@@ -100,18 +100,18 @@ def get_same_domain_recommendations(
     except HTTPException:
         raise
     except Exception as e:
-        print(f"❌ Erreur recommandations: {e}")
+        print(f" Erreur recommandations: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Erreur lors de la récupération des recommandations"
+            detail="Erreur lors de la rcupration des recommandations"
         )
 
 @router.get("/test")
 def test_recommendations():
-    """Test endpoint pour vérifier que le router fonctionne"""
+    """Test endpoint pour vrifier que le router fonctionne"""
     return {
-        "message": "✅ Recommendations router is working!",
-        "description": "Ce module recommande des livres du même domaine",
+        "message": " Recommendations router is working!",
+        "description": "Ce module recommande des livres du mme domaine",
         "endpoint": "GET /api/recommendations/announcements/{announcement_id}",
         "example": "GET /api/recommendations/announcements/1?limit=4"
     }

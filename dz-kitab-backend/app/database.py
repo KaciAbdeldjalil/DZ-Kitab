@@ -10,23 +10,23 @@
 # # Charger les variables d'environnement
 # load_dotenv()
 
-# # URL de connexion - Support SQLite par défaut pour le développement local facile
+# # URL de connexion - Support SQLite par dfaut pour le dveloppement local facile
 # DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./dzkitab.db")
 
-# # Créer le moteur SQLAlchemy
+# # Crer le moteur SQLAlchemy
 # if DATABASE_URL.startswith("sqlite"):
 #     engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 # else:
 #     engine = create_engine(DATABASE_URL)
 
 
-# # Créer une session locale
+# # Crer une session locale
 # SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# # Base pour les modèles
+# # Base pour les modles
 # Base = declarative_base()
 
-# # Dépendance pour obtenir la session DB
+# # Dpendance pour obtenir la session DB
 # def get_db():
 #     db = SessionLocal()
 #     try:
@@ -61,19 +61,19 @@ DATABASE_URL = os.getenv(
     f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 )
 
-# Créer le moteur SQLAlchemy
+# Crer le moteur SQLAlchemy
 if DATABASE_URL.startswith("sqlite"):
     engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 else:
     engine = create_engine(DATABASE_URL, pool_pre_ping=True)
 
-# Créer une session locale
+# Crer une session locale
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# Base pour les modèles
+# Base pour les modles
 Base = declarative_base()
 
-# Dépendance pour obtenir la session DB
+# Dpendance pour obtenir la session DB
 def get_db():
     db = SessionLocal()
     try:

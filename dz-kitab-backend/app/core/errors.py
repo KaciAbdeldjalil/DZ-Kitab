@@ -20,19 +20,19 @@ class DZKitabException(Exception):
         super().__init__(self.message)
 
 class ResourceNotFoundError(DZKitabException):
-    """Ressource non trouvée"""
+    """Ressource non trouve"""
     def __init__(self, resource: str, resource_id: Union[int, str]):
-        message = f"{resource} avec l'ID {resource_id} non trouvé(e)"
+        message = f"{resource} avec l'ID {resource_id} non trouv(e)"
         super().__init__(message, status_code=404)
 
 class UnauthorizedError(DZKitabException):
-    """Non autorisé"""
-    def __init__(self, message: str = "Non autorisé"):
+    """Non autoris"""
+    def __init__(self, message: str = "Non autoris"):
         super().__init__(message, status_code=401)
 
 class ForbiddenError(DZKitabException):
-    """Accès interdit"""
-    def __init__(self, message: str = "Accès interdit"):
+    """Accs interdit"""
+    def __init__(self, message: str = "Accs interdit"):
         super().__init__(message, status_code=403)
 
 class ValidationError(DZKitabException):
@@ -41,8 +41,8 @@ class ValidationError(DZKitabException):
         super().__init__(message, status_code=400)
 
 class DatabaseError(DZKitabException):
-    """Erreur de base de données"""
-    def __init__(self, message: str = "Erreur de base de données"):
+    """Erreur de base de donnes"""
+    def __init__(self, message: str = "Erreur de base de donnes"):
         super().__init__(message, status_code=500)
 
 class ExternalServiceError(DZKitabException):
@@ -56,7 +56,7 @@ class ExternalServiceError(DZKitabException):
 # ============================================
 
 async def dzkitab_exception_handler(request: Request, exc: DZKitabException):
-    """Gestionnaire pour nos exceptions personnalisées"""
+    """Gestionnaire pour nos exceptions personnalises"""
     return JSONResponse(
         status_code=exc.status_code,
         content={
@@ -87,7 +87,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
             "success": False,
             "error": {
                 "type": "ValidationError",
-                "message": "Erreur de validation des données",
+                "message": "Erreur de validation des donnes",
                 "details": errors,
                 "path": str(request.url.path)
             }
@@ -95,22 +95,22 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     )
 
 async def integrity_error_handler(request: Request, exc: IntegrityError):
-    """Gestionnaire pour les erreurs d'intégrité SQL"""
+    """Gestionnaire pour les erreurs d'intgrit SQL"""
     error_msg = str(exc.orig)
     
-    # Détecter les types d'erreurs courants
+    # Dtecter les types d'erreurs courants
     if "unique constraint" in error_msg.lower():
-        message = "Cette valeur existe déjà dans la base de données"
+        message = "Cette valeur existe dj dans la base de donnes"
         if "email" in error_msg.lower():
-            message = "Cet email est déjà utilisé"
+            message = "Cet email est dj utilis"
         elif "username" in error_msg.lower():
-            message = "Ce nom d'utilisateur est déjà pris"
+            message = "Ce nom d'utilisateur est dj pris"
     elif "foreign key constraint" in error_msg.lower():
-        message = "Référence invalide vers une ressource inexistante"
+        message = "Rfrence invalide vers une ressource inexistante"
     elif "not null constraint" in error_msg.lower():
         message = "Champ requis manquant"
     else:
-        message = "Erreur de contrainte de base de données"
+        message = "Erreur de contrainte de base de donnes"
     
     return JSONResponse(
         status_code=status.HTTP_409_CONFLICT,
@@ -125,8 +125,8 @@ async def integrity_error_handler(request: Request, exc: IntegrityError):
     )
 
 async def operational_error_handler(request: Request, exc: OperationalError):
-    """Gestionnaire pour les erreurs opérationnelles SQL"""
-    print(f"❌ Database operational error: {exc}")
+    """Gestionnaire pour les erreurs oprationnelles SQL"""
+    print(f" Database operational error: {exc}")
     
     return JSONResponse(
         status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -134,7 +134,7 @@ async def operational_error_handler(request: Request, exc: OperationalError):
             "success": False,
             "error": {
                 "type": "DatabaseError",
-                "message": "Service de base de données temporairement indisponible",
+                "message": "Service de base de donnes temporairement indisponible",
                 "path": str(request.url.path)
             }
         }
@@ -148,7 +148,7 @@ async def jwt_error_handler(request: Request, exc: JWTError):
             "success": False,
             "error": {
                 "type": "AuthenticationError",
-                "message": "Token invalide ou expiré",
+                "message": "Token invalide ou expir",
                 "path": str(request.url.path)
             }
         },
@@ -171,12 +171,12 @@ async def general_exception_handler(request: Request, exc: Exception):
             }
         )
     except Exception as log_error:
-        print(f"⚠️ Erreur lors de l'écriture du log: {log_error}")
-    print(f"❌ Unhandled exception: {type(exc).__name__}")
+        print(f" Erreur lors de l'criture du log: {log_error}")
+    print(f" Unhandled exception: {type(exc).__name__}")
     print(f"Message: {str(exc)}")
     print(f"Traceback:\n{error_traceback}")
     
-    # En production, ne pas exposer les détails
+    # En production, ne pas exposer les dtails
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={
@@ -194,7 +194,7 @@ async def general_exception_handler(request: Request, exc: Exception):
 # ============================================
 
 def success_response(data: any, message: str = None, status_code: int = 200):
-    """Générer une réponse de succès standardisée"""
+    """Gnrer une rponse de succs standardise"""
     response = {
         "success": True,
         "data": data
@@ -208,7 +208,7 @@ def success_response(data: any, message: str = None, status_code: int = 200):
     )
 
 def error_response(message: str, status_code: int = 400, details: any = None):
-    """Générer une réponse d'erreur standardisée"""
+    """Gnrer une rponse d'erreur standardise"""
     response = {
         "success": False,
         "error": {

@@ -33,7 +33,7 @@ class User(Base):
         "Announcement", 
         back_populates="user", 
         cascade="all, delete-orphan",
-        lazy="select"  # ✅ Chargement paresseux
+        lazy="select"  #  Chargement paresseux
     )
 
     # Rating relationships
@@ -42,7 +42,7 @@ class User(Base):
         foreign_keys="Rating.buyer_id",
         back_populates="buyer",
         cascade="all, delete-orphan",
-        lazy="select"  # ✅ Chargement paresseux
+        lazy="select"  #  Chargement paresseux
     )
 
     ratings_received = relationship(
@@ -50,7 +50,7 @@ class User(Base):
         foreign_keys="Rating.seller_id",
         back_populates="seller",
         cascade="all, delete-orphan",
-        lazy="select"  # ✅ Chargement paresseux
+        lazy="select"  #  Chargement paresseux
     )
 
     seller_stats = relationship(
@@ -58,7 +58,7 @@ class User(Base):
         back_populates="user",
         uselist=False,
         cascade="all, delete-orphan",
-        lazy="select"  # ✅ Chargement paresseux
+        lazy="select"  #  Chargement paresseux
     )
 
     # Notification relationships
@@ -67,7 +67,7 @@ class User(Base):
         foreign_keys="Notification.user_id",
         back_populates="user",
         cascade="all, delete-orphan",
-        lazy="select"  # ✅ Chargement paresseux
+        lazy="select"  #  Chargement paresseux
     )
     
     notification_preferences = relationship(
@@ -75,7 +75,7 @@ class User(Base):
         back_populates="user",
         uselist=False,
         cascade="all, delete-orphan",
-        lazy="select"  # ✅ Chargement paresseux
+        lazy="select"  #  Chargement paresseux
     )
 
     # Suspension relationships
@@ -83,14 +83,14 @@ class User(Base):
         "UserSuspension",
         back_populates="user",
         cascade="all, delete-orphan",
-        lazy="select"  # ✅ Chargement paresseux
+        lazy="select"  #  Chargement paresseux
     )
 
     rating_alerts = relationship(
         "RatingAlert",
         back_populates="user",
         cascade="all, delete-orphan",
-        lazy="select"  # ✅ Chargement paresseux
+        lazy="select"  #  Chargement paresseux
     )
 
     def __repr__(self):

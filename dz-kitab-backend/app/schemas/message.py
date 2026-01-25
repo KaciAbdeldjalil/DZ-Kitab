@@ -5,22 +5,22 @@ from typing import Optional, List
 from datetime import datetime
 
 class MessageCreate(BaseModel):
-    """Schéma pour créer un nouveau message"""
-    announcement_id: int = Field(..., description="ID de l'annonce concernée")
+    """Schma pour crer un nouveau message"""
+    announcement_id: int = Field(..., description="ID de l'annonce concerne")
     receiver_id: int = Field(..., description="ID du destinataire")
     content: str = Field(..., min_length=1, max_length=2000, description="Contenu du message")
 
 class ContactSellerRequest(BaseModel):
-    """Schéma pour le formulaire de contact vendeur"""
+    """Schma pour le formulaire de contact vendeur"""
     announcement_id: int
     title: str = Field(..., description="Titre du livre (automatique)")
-    email: str = Field(..., description="Email de l'acheteur (automatique)")
+    email: Optional[str] = Field(None, description="Email de l'acheteur")
     address: Optional[str] = Field(None, max_length=200, description="Adresse de l'acheteur")
-    phone: Optional[str] = Field(None, max_length=20, description="Téléphone de l'acheteur")
-    message: str = Field(..., min_length=10, max_length=2000, description="Message à envoyer")
+    phone: Optional[str] = Field(None, max_length=20, description="Tlphone de l'acheteur")
+    message: str = Field(..., min_length=1, max_length=2000, description="Message  envoyer")
 
 class MessageResponse(BaseModel):
-    """Schéma de réponse pour un message"""
+    """Schma de rponse pour un message"""
     id: int
     conversation_id: int
     sender_id: int
@@ -37,7 +37,7 @@ class MessageResponse(BaseModel):
         from_attributes = True
 
 class ConversationResponse(BaseModel):
-    """Schéma de réponse pour une conversation"""
+    """Schma de rponse pour une conversation"""
     id: int
     announcement_id: Optional[int] = None
     buyer_id: int

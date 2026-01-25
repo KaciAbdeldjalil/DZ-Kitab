@@ -24,10 +24,10 @@ router = APIRouter()
 def test_curriculum():
     """Test endpoint"""
     return {
-        "message": "✅ Curriculum router is working!",
+        "message": " Curriculum router is working!",
         "endpoints": [
             "GET /curriculum/ - Liste des cursus",
-            "GET /curriculum/{id} - Détails d'un cursus",
+            "GET /curriculum/{id} - Dtails d'un cursus",
             "GET /curriculum/badges/book/{book_id} - Badges d'un livre",
             "GET /curriculum/{id}/books - Livres d'un cursus",
             "GET /curriculum/stats/overview - Statistiques",
@@ -49,7 +49,7 @@ def get_current_user_id(token: str = Depends(security), db: Session = Depends(ge
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Utilisateur non trouvé"
+            detail="Utilisateur non trouv"
         )
     
     return user.id
@@ -68,11 +68,11 @@ def get_curriculums(
     db: Session = Depends(get_db)
 ):
     """
-    📚 Obtenir la liste de tous les cursus disponibles
+     Obtenir la liste de tous les cursus disponibles
     
     Filtres optionnels:
-    - university: Filtrer par université (ex: "USTHB")
-    - field: Filtrer par filière (ex: "Informatique")
+    - university: Filtrer par universit (ex: "USTHB")
+    - field: Filtrer par filire (ex: "Informatique")
     """
     try:
         query = db.query(Curriculum)
@@ -105,10 +105,10 @@ def get_curriculums(
         }
         
     except Exception as e:
-        print(f"❌ Erreur récupération cursus: {e}")
+        print(f" Erreur rcupration cursus: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Erreur lors de la récupération des cursus"
+            detail="Erreur lors de la rcupration des cursus"
         )
 
 
@@ -122,7 +122,7 @@ def get_curriculum_details(
     db: Session = Depends(get_db)
 ):
     """
-    📖 Obtenir les détails d'un cursus et ses livres recommandés
+     Obtenir les dtails d'un cursus et ses livres recommands
     """
     try:
         curriculum = db.query(Curriculum).filter(Curriculum.id == curriculum_id).first()
@@ -130,10 +130,10 @@ def get_curriculum_details(
         if not curriculum:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Cursus non trouvé"
+                detail="Cursus non trouv"
             )
         
-        # Formater les livres recommandés
+        # Formater les livres recommands
         recommended_books = []
         for book in curriculum.recommended_books:
             recommended_books.append({
@@ -161,10 +161,10 @@ def get_curriculum_details(
     except HTTPException:
         raise
     except Exception as e:
-        print(f"❌ Erreur détails cursus: {e}")
+        print(f" Erreur dtails cursus: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Erreur lors de la récupération des détails"
+            detail="Erreur lors de la rcupration des dtails"
         )
 
 
@@ -178,9 +178,9 @@ def get_book_badges(
     db: Session = Depends(get_db)
 ):
     """
-    🏷️ Obtenir les badges de cursus pour un livre
+     Obtenir les badges de cursus pour un livre
     
-    Retourne les badges "Recommandé en [Cursus]" si le livre correspond
+    Retourne les badges "Recommand en [Cursus]" si le livre correspond
     """
     try:
         book = db.query(Book).filter(Book.id == book_id).first()
@@ -188,7 +188,7 @@ def get_book_badges(
         if not book:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Livre non trouvé"
+                detail="Livre non trouv"
             )
         
         badges = get_book_curriculum_badges(db, book_id)
@@ -203,10 +203,10 @@ def get_book_badges(
     except HTTPException:
         raise
     except Exception as e:
-        print(f"❌ Erreur badges: {e}")
+        print(f" Erreur badges: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Erreur lors de la récupération des badges"
+            detail="Erreur lors de la rcupration des badges"
         )
 
 
@@ -222,10 +222,10 @@ def search_books_by_curriculum_endpoint(
     db: Session = Depends(get_db)
 ):
     """
-    🔍 Rechercher tous les livres disponibles pour un cursus
+     Rechercher tous les livres disponibles pour un cursus
     
     Retourne toutes les annonces de livres qui correspondent aux livres
-    recommandés pour ce cursus
+    recommands pour ce cursus
     """
     try:
         curriculum = db.query(Curriculum).filter(Curriculum.id == curriculum_id).first()
@@ -233,14 +233,14 @@ def search_books_by_curriculum_endpoint(
         if not curriculum:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Cursus non trouvé"
+                detail="Cursus non trouv"
             )
         
         # Trouver les livres correspondants
         books = search_books_by_curriculum(db, curriculum_id)
         book_ids = [b.id for b in books]
         
-        # Récupérer les annonces pour ces livres
+        # Rcuprer les annonces pour ces livres
         query = db.query(Announcement).filter(
             Announcement.book_id.in_(book_ids),
             Announcement.status == "Active"
@@ -249,7 +249,7 @@ def search_books_by_curriculum_endpoint(
         total = query.count()
         announcements = query.offset(skip).limit(limit).all()
         
-        # Formater les résultats
+        # Formater les rsultats
         result = []
         for ann in announcements:
             book = db.query(Book).filter(Book.id == ann.book_id).first()
@@ -286,7 +286,7 @@ def search_books_by_curriculum_endpoint(
     except HTTPException:
         raise
     except Exception as e:
-        print(f"❌ Erreur recherche livres: {e}")
+        print(f" Erreur recherche livres: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Erreur lors de la recherche"
@@ -300,18 +300,18 @@ def search_books_by_curriculum_endpoint(
 @router.get("/stats/overview")
 def get_curriculum_statistics(db: Session = Depends(get_db)):
     """
-    📊 Obtenir des statistiques sur les cursus
+     Obtenir des statistiques sur les cursus
     """
     try:
         stats = get_curriculum_stats(db)
         
-        # Cursus par université
+        # Cursus par universit
         curriculums_by_university = db.query(
             Curriculum.university,
             db.func.count(Curriculum.id).label('count')
         ).group_by(Curriculum.university).all()
         
-        # Cursus par filière
+        # Cursus par filire
         curriculums_by_field = db.query(
             Curriculum.field,
             db.func.count(Curriculum.id).label('count')
@@ -330,10 +330,10 @@ def get_curriculum_statistics(db: Session = Depends(get_db)):
         }
         
     except Exception as e:
-        print(f"❌ Erreur statistiques: {e}")
+        print(f" Erreur statistiques: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Erreur lors de la récupération des statistiques"
+            detail="Erreur lors de la rcupration des statistiques"
         )
 
 
@@ -347,32 +347,32 @@ def trigger_book_matching(
     user_id: int = Depends(get_current_user_id)
 ):
     """
-    🔄 Matcher tous les livres avec les recommandations (ADMIN)
+     Matcher tous les livres avec les recommandations (ADMIN)
     
-    À exécuter après un scraping ou périodiquement
+     excuter aprs un scraping ou priodiquement
     """
     try:
-        # Vérifier que l'utilisateur est admin
+        # Vrifier que l'utilisateur est admin
         user = db.query(User).filter(User.id == user_id).first()
         
         if not user or not user.is_admin:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Accès réservé aux administrateurs"
+                detail="Accs rserv aux administrateurs"
             )
         
         # Lancer le matching
         auto_match_all_books(db)
         
         return {
-            "message": "Matching terminé avec succès",
+            "message": "Matching termin avec succs",
             "stats": get_curriculum_stats(db)
         }
         
     except HTTPException:
         raise
     except Exception as e:
-        print(f"❌ Erreur matching: {e}")
+        print(f" Erreur matching: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Erreur lors du matching"

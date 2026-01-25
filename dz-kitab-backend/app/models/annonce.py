@@ -15,5 +15,5 @@ class Annonce(models.Model):
     publication_date = models.CharField(max_length=50, null=True)
 
     class Meta:
-        managed = False   # ⚠️ CRUCIAL : on ne laisse pas Django toucher la DB
+        managed = False   #  CRUCIAL : on ne laisse pas Django toucher la DB
         db_table = 'announcements'  # on lie au vrai nom SQL

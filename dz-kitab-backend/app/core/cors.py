@@ -7,16 +7,16 @@ from typing import List
 
 def get_allowed_origins() -> List[str]:
     """
-    Récupérer les origines autorisées selon l'environnement
+    Rcuprer les origines autorises selon l'environnement
     """
     environment = os.getenv("ENVIRONMENT", "development")
     
     if environment == "production":
-        # En production, utiliser uniquement les domaines configurés
+        # En production, utiliser uniquement les domaines configurs
         origins = os.getenv("ALLOWED_ORIGINS", "").split(",")
         return [origin.strip() for origin in origins if origin.strip()]
     else:
-        # En développement, autoriser localhost et 127.0.0.1
+        # En dveloppement, autoriser localhost et 127.0.0.1
         return [
             "http://localhost:3000",
             "http://localhost:5173",
@@ -32,9 +32,9 @@ def configure_cors(app: FastAPI) -> None:
     """
     Configurer CORS pour l'application FastAPI
     
-    Configuration adaptée selon l'environnement:
-    - Development: Permissif pour faciliter le développement
-    - Production: Restrictif pour la sécurité
+    Configuration adapte selon l'environnement:
+    - Development: Permissif pour faciliter le dveloppement
+    - Production: Restrictif pour la scurit
     """
     
     allowed_origins = get_allowed_origins()
@@ -61,7 +61,7 @@ def configure_cors(app: FastAPI) -> None:
         "max_age": 600,  # 10 minutes de cache pour les preflight
     }
     
-    # En production, ajouter des headers de sécurité supplémentaires
+    # En production, ajouter des headers de scurit supplmentaires
     if environment == "production":
         cors_config["expose_headers"].extend([
             "X-RateLimit-Limit",
@@ -71,11 +71,11 @@ def configure_cors(app: FastAPI) -> None:
     
     app.add_middleware(CORSMiddleware, **cors_config)
     
-    print(f"✅ CORS configuré pour l'environnement: {environment}")
-    print(f"📋 Origines autorisées: {allowed_origins}")
+    print(f" CORS configur pour l'environnement: {environment}")
+    print(f" Origines autorises: {allowed_origins}")
 
 # ============================================
-# MIDDLEWARE PERSONNALISÉ POUR DEBUG CORS
+# MIDDLEWARE PERSONNALIS POUR DEBUG CORS
 # ============================================
 
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -83,23 +83,23 @@ from fastapi import Request, Response
 
 class CORSDebugMiddleware(BaseHTTPMiddleware):
     """
-    Middleware pour debugger les problèmes CORS en développement
+    Middleware pour debugger les problmes CORS en dveloppement
     """
     
     async def dispatch(self, request: Request, call_next):
-        # Log des requêtes OPTIONS (preflight)
+        # Log des requtes OPTIONS (preflight)
         if request.method == "OPTIONS":
             origin = request.headers.get("origin", "No origin")
-            print(f"🔍 CORS Preflight: {request.method} {request.url.path}")
+            print(f" CORS Preflight: {request.method} {request.url.path}")
             print(f"   Origin: {origin}")
             print(f"   Headers: {dict(request.headers)}")
         
         response = await call_next(request)
         
-        # En développement, log des headers CORS dans la réponse
+        # En dveloppement, log des headers CORS dans la rponse
         environment = os.getenv("ENVIRONMENT", "development")
         if environment == "development" and request.method == "OPTIONS":
-            print(f"✅ CORS Response headers:")
+            print(f" CORS Response headers:")
             cors_headers = {k: v for k, v in response.headers.items() if "access-control" in k.lower()}
             for key, value in cors_headers.items():
                 print(f"   {key}: {value}")
@@ -108,10 +108,10 @@ class CORSDebugMiddleware(BaseHTTPMiddleware):
 
 def add_cors_debug_middleware(app: FastAPI) -> None:
     """
-    Ajouter le middleware de debug CORS en développement
+    Ajouter le middleware de debug CORS en dveloppement
     """
     environment = os.getenv("ENVIRONMENT", "development")
     
     if environment == "development":
         app.add_middleware(CORSDebugMiddleware)
-        print("🔍 CORS Debug Middleware activé")
+        print(" CORS Debug Middleware activ")

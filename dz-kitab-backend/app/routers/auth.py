@@ -25,7 +25,7 @@ def register(user_data: UserCreate, db: Session = Depends(get_db)):
     - **phone_number**: Optional phone number
     """
     try:
-        print(f"📧 Registration attempt: {user_data.email}")
+        print(f" Registration attempt: {user_data.email}")
         
         # Check if user already exists
         existing_user = db.query(User).filter(
@@ -36,19 +36,19 @@ def register(user_data: UserCreate, db: Session = Depends(get_db)):
             if existing_user.email == user_data.email:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Cet email est déjà utilisé"
+                    detail="Cet email est dj utilis"
                 )
             else:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Ce nom d'utilisateur est déjà pris"
+                    detail="Ce nom d'utilisateur est dj pris"
                 )
         
         # Validate password strength
         if len(user_data.password) < 8:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Le mot de passe doit contenir au moins 8 caractères"
+                detail="Le mot de passe doit contenir au moins 8 caractres"
             )
         
         # Hash password
@@ -69,10 +69,10 @@ def register(user_data: UserCreate, db: Session = Depends(get_db)):
         db.commit()
         db.refresh(user)
         
-        print(f"✅ User created: {user.id} - {user.email}")
+        print(f" User created: {user.id} - {user.email}")
         
         return {
-            "message": "Utilisateur créé avec succès",
+            "message": "Utilisateur cr avec succs",
             "user_id": user.id,
             "email": user.email,
             "username": user.username
@@ -81,7 +81,7 @@ def register(user_data: UserCreate, db: Session = Depends(get_db)):
     except HTTPException:
         raise
     except Exception as e:
-        print(f"❌ Registration error: {e}")
+        print(f" Registration error: {e}")
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -99,7 +99,7 @@ def login(credentials: UserLogin, db: Session = Depends(get_db)):
     Returns JWT access token and user information
     """
     try:
-        print(f"🔐 Login attempt: {credentials.email}")
+        print(f" Login attempt: {credentials.email}")
         
         # Find user by email
         user = db.query(User).filter(User.email == credentials.email).first()
@@ -121,13 +121,13 @@ def login(credentials: UserLogin, db: Session = Depends(get_db)):
         if not user.is_active:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Compte désactivé. Contactez l'administrateur."
+                detail="Compte dsactiv. Contactez l'administrateur."
             )
         
         # Create access token
         access_token = create_user_token(user.id, user.email)
         
-        print(f"✅ Login successful: {user.email}")
+        print(f" Login successful: {user.email}")
         
         return {
             "access_token": access_token,
@@ -150,7 +150,7 @@ def login(credentials: UserLogin, db: Session = Depends(get_db)):
     except HTTPException:
         raise
     except Exception as e:
-        print(f"❌ Login error: {e}")
+        print(f" Login error: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Erreur lors de la connexion"
@@ -169,7 +169,7 @@ def get_current_user(token: str = Depends(security), db: Session = Depends(get_d
         if not payload:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Token invalide ou expiré"
+                detail="Token invalide ou expir"
             )
         
         email = payload.get("sub")
@@ -178,13 +178,13 @@ def get_current_user(token: str = Depends(security), db: Session = Depends(get_d
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Utilisateur non trouvé"
+                detail="Utilisateur non trouv"
             )
         
         if not user.is_active:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Compte désactivé"
+                detail="Compte dsactiv"
             )
         
         return {
@@ -204,7 +204,7 @@ def get_current_user(token: str = Depends(security), db: Session = Depends(get_d
     except HTTPException:
         raise
     except Exception as e:
-        print(f"❌ Error getting user: {e}")
+        print(f" Error getting user: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Erreur serveur"
@@ -235,14 +235,14 @@ def update_profile(
     if not payload:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token invalide ou expiré"
+            detail="Token invalide ou expir"
         )
         
     email = payload.get("sub")
     user = db.query(User).filter(User.email == email).first()
     
     if not user:
-        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+        raise HTTPException(status_code=404, detail="Utilisateur non trouv")
 
     # 2. Update fields ONLY if they are sent (not None)
     if user_update.first_name is not None:
@@ -267,5 +267,5 @@ def update_profile(
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Erreur lors de la mise à jour du profil"
+            detail="Erreur lors de la mise  jour du profil"
         )

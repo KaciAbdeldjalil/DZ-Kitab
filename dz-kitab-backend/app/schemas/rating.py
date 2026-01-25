@@ -4,7 +4,7 @@ from datetime import datetime
 
 class RatingCreate(BaseModel):
     announcement_id: int
-    rating: int = Field(..., ge=1, le=5, description="Note globale (1-5 étoiles)")
+    rating: int = Field(..., ge=1, le=5, description="Note globale (1-5 toiles)")
     comment: Optional[str] = Field(None, max_length=1000)
     communication_rating: Optional[int] = Field(None, ge=1, le=5)
     condition_accuracy_rating: Optional[int] = Field(None, ge=1, le=5)

@@ -20,7 +20,7 @@ def get_current_user_id(token: str = Depends(security), db: Session = Depends(ge
     email = payload.get("sub")
     user = db.query(User).filter(User.email == email).first()
     if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Utilisateur non trouvé")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Utilisateur non trouv")
     return user.id
 
 @router.post("/", response_model=WishlistResponse)
@@ -32,7 +32,7 @@ def add_to_wishlist(
     # Check if announcement exists
     announcement = db.query(Announcement).filter(Announcement.id == wishlist_data.announcement_id).first()
     if not announcement:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Annonce non trouvée")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Annonce non trouve")
     
     # Check if already in wishlist
     existing = db.query(Wishlist).filter(
@@ -67,8 +67,8 @@ def remove_from_wishlist(
         Wishlist.announcement_id == announcement_id
     ).first()
     if not item:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item non trouvé dans la wishlist")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item non trouv dans la wishlist")
     
     db.delete(item)
     db.commit()
-    return {"message": "Supprimé de la wishlist"}
+    return {"message": "Supprim de la wishlist"}

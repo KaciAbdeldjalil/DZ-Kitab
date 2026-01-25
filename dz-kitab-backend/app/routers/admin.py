@@ -16,7 +16,7 @@ router = APIRouter()
 
 def get_current_admin(token: str = Depends(security), db: Session = Depends(get_db)) -> User:
     """
-    ✅ CORRECTION: Verify the current user is an admin using is_admin field
+     CORRECTION: Verify the current user is an admin using is_admin field
     """
     payload = verify_token(token)
     if not payload:
@@ -31,7 +31,7 @@ def get_current_admin(token: str = Depends(security), db: Session = Depends(get_
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Utilisateur non trouvé"
+            detail="Utilisateur non trouv"
         )
     
     # Check if user is admin (you may need to add is_admin field to User model)
@@ -39,7 +39,7 @@ def get_current_admin(token: str = Depends(security), db: Session = Depends(get_
     if not user.is_admin:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Accès réservé aux administrateurs. Contactez un administrateur pour obtenir les privilèges."
+            detail="Accs rserv aux administrateurs. Contactez un administrateur pour obtenir les privilges."
         )
     
     return user
@@ -74,7 +74,7 @@ def get_dashboard_stats(
             Announcement.status == "Vendu"
         ).count()
         reserved_announcements = db.query(Announcement).filter(
-            Announcement.status == "Réservé"
+            Announcement.status == "Rserv"
         ).count()
         
         # Rating statistics
@@ -110,10 +110,10 @@ def get_dashboard_stats(
         }
         
     except Exception as e:
-        print(f"❌ Error fetching dashboard stats: {e}")
+        print(f" Error fetching dashboard stats: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Erreur lors de la récupération des statistiques"
+            detail="Erreur lors de la rcupration des statistiques"
         )
 
 @router.get("/stats/popular-books")
@@ -153,10 +153,10 @@ def get_popular_books(
         return {"books": result}
         
     except Exception as e:
-        print(f"❌ Error fetching popular books: {e}")
+        print(f" Error fetching popular books: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Erreur lors de la récupération des livres populaires"
+            detail="Erreur lors de la rcupration des livres populaires"
         )
 
 @router.get("/stats/sales-by-category")
@@ -193,10 +193,10 @@ def get_sales_by_category(
         }
         
     except Exception as e:
-        print(f"❌ Error fetching sales by category: {e}")
+        print(f" Error fetching sales by category: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Erreur lors de la récupération des ventes par catégorie"
+            detail="Erreur lors de la rcupration des ventes par catgorie"
         )
 
 # ============================================
@@ -273,10 +273,10 @@ def get_all_users(
         }
         
     except Exception as e:
-        print(f"❌ Error fetching users: {e}")
+        print(f" Error fetching users: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Erreur lors de la récupération des utilisateurs"
+            detail="Erreur lors de la rcupration des utilisateurs"
         )
 
 @router.put("/users/{user_id}/block")
@@ -292,7 +292,7 @@ def block_user(
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Utilisateur non trouvé"
+                detail="Utilisateur non trouv"
             )
         
         if user.id == admin.id:
@@ -305,14 +305,14 @@ def block_user(
         db.commit()
         
         return {
-            "message": f"Utilisateur {user.username} bloqué avec succès",
+            "message": f"Utilisateur {user.username} bloqu avec succs",
             "user_id": user_id
         }
         
     except HTTPException:
         raise
     except Exception as e:
-        print(f"❌ Error blocking user: {e}")
+        print(f" Error blocking user: {e}")
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -332,21 +332,21 @@ def activate_user(
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Utilisateur non trouvé"
+                detail="Utilisateur non trouv"
             )
         
         user.is_active = True
         db.commit()
         
         return {
-            "message": f"Utilisateur {user.username} activé avec succès",
+            "message": f"Utilisateur {user.username} activ avec succs",
             "user_id": user_id
         }
         
     except HTTPException:
         raise
     except Exception as e:
-        print(f"❌ Error activating user: {e}")
+        print(f" Error activating user: {e}")
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -366,7 +366,7 @@ def delete_user(
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Utilisateur non trouvé"
+                detail="Utilisateur non trouv"
             )
         
         if user.id == admin.id:
@@ -380,14 +380,14 @@ def delete_user(
         db.commit()
         
         return {
-            "message": f"Utilisateur {user.username} supprimé avec succès",
+            "message": f"Utilisateur {user.username} supprim avec succs",
             "user_id": user_id
         }
         
     except HTTPException:
         raise
     except Exception as e:
-        print(f"❌ Error deleting user: {e}")
+        print(f" Error deleting user: {e}")
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -454,10 +454,10 @@ def get_all_announcements(
         }
         
     except Exception as e:
-        print(f"❌ Error fetching announcements: {e}")
+        print(f" Error fetching announcements: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Erreur lors de la récupération des annonces"
+            detail="Erreur lors de la rcupration des annonces"
         )
 
 @router.delete("/announcements/{announcement_id}")
@@ -475,21 +475,21 @@ def delete_announcement(
         if not announcement:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Annonce non trouvée"
+                detail="Annonce non trouve"
             )
         
         db.delete(announcement)
         db.commit()
         
         return {
-            "message": "Annonce supprimée avec succès",
+            "message": "Annonce supprime avec succs",
             "announcement_id": announcement_id
         }
         
     except HTTPException:
         raise
     except Exception as e:
-        print(f"❌ Error deleting announcement: {e}")
+        print(f" Error deleting announcement: {e}")
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

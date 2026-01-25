@@ -42,7 +42,7 @@ async def fetch_book_from_openlibrary(isbn: str) -> Optional[Dict[str, Any]]:
             "info_link": book_data.get("url"),
         }
     except Exception as e:
-        print(f"⚠️ Error fetching from OpenLibrary: {e}")
+        print(f" Error fetching from OpenLibrary: {e}")
         return None
 
 async def scrape_book_from_babelio(isbn: str) -> Optional[Dict[str, Any]]:
@@ -86,7 +86,7 @@ async def scrape_book_from_babelio(isbn: str) -> Optional[Dict[str, Any]]:
                 "published_date": None # Hard to extract reliably without more complex regex
             }
     except Exception as e:
-        print(f"⚠️ Error scraping from Babelio: {e}")
+        print(f" Error scraping from Babelio: {e}")
         return None
 
 async def fetch_book_by_isbn_scraping(isbn: str) -> Optional[Dict[str, Any]]:

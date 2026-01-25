@@ -8,7 +8,7 @@ from difflib import SequenceMatcher
 
 
 def normalize_string(s: str) -> str:
-    """Normaliser une chaîne pour la comparaison"""
+    """Normaliser une chane pour la comparaison"""
     if not s:
         return ""
     return s.lower().strip().replace("-", " ").replace("'", " ")
@@ -16,17 +16,17 @@ def normalize_string(s: str) -> str:
 
 def calculate_similarity(str1: str, str2: str) -> float:
     """
-    Calculer la similarité entre deux chaînes (0.0 à 1.0)
+    Calculer la similarit entre deux chanes (0.0  1.0)
     """
     return SequenceMatcher(None, normalize_string(str1), normalize_string(str2)).ratio()
 
 
 def match_book_to_recommendations(db: Session, book: Book) -> List[BookCurriculumMatch]:
     """
-    Trouver si un livre correspond à des livres recommandés
+    Trouver si un livre correspond  des livres recommands
     
     Returns:
-        Liste des correspondances trouvées
+        Liste des correspondances trouves
     """
     matches = []
     
@@ -51,11 +51,11 @@ def match_book_to_recommendations(db: Session, book: Book) -> List[BookCurriculu
     ).all()
     
     for rec in recommended:
-        # Vérifier si ce match n'existe pas déjà
+        # Vrifier si ce match n'existe pas dj
         if not any(m.recommended_book_id == rec.id for m in matches):
             similarity = calculate_similarity(book.title, rec.title)
             
-            if similarity >= 0.85:  # 85% de similarité
+            if similarity >= 0.85:  # 85% de similarit
                 match = BookCurriculumMatch(
                     book_id=book.id,
                     recommended_book_id=rec.id,
@@ -71,7 +71,7 @@ def match_book_to_recommendations(db: Session, book: Book) -> List[BookCurriculu
         for rec in all_recommended:
             similarity = calculate_similarity(book.title, rec.title)
             
-            if similarity >= 0.7:  # 70% de similarité
+            if similarity >= 0.7:  # 70% de similarit
                 match = BookCurriculumMatch(
                     book_id=book.id,
                     recommended_book_id=rec.id,
@@ -92,7 +92,7 @@ def get_book_curriculum_badges(db: Session, book_id: int) -> List[Dict]:
     """
     badges = []
     
-    # Récupérer les matches pour ce livre
+    # Rcuprer les matches pour ce livre
     matches = db.query(BookCurriculumMatch).filter(
         BookCurriculumMatch.book_id == book_id,
         BookCurriculumMatch.match_score >= 70  # Seuil minimum
@@ -104,7 +104,7 @@ def get_book_curriculum_badges(db: Session, book_id: int) -> List[Dict]:
         ).first()
         
         if recommended_book:
-            # Récupérer tous les cursus pour ce livre recommandé
+            # Rcuprer tous les cursus pour ce livre recommand
             for curriculum in recommended_book.curriculums:
                 badges.append({
                     "curriculum_id": curriculum.id,
@@ -114,10 +114,10 @@ def get_book_curriculum_badges(db: Session, book_id: int) -> List[Dict]:
                     "year": curriculum.year,
                     "match_score": match.match_score,
                     "match_method": match.match_method,
-                    "badge_text": f"Recommandé en {curriculum.name}"
+                    "badge_text": f"Recommand en {curriculum.name}"
                 })
     
-    # Retourner les badges uniques triés par score
+    # Retourner les badges uniques tris par score
     unique_badges = []
     seen = set()
     
@@ -133,21 +133,21 @@ def get_book_curriculum_badges(db: Session, book_id: int) -> List[Dict]:
 def auto_match_all_books(db: Session):
     """
     Matcher automatiquement tous les livres existants avec les recommandations
-    À exécuter après le scraping ou périodiquement
+     excuter aprs le scraping ou priodiquement
     """
-    print("\n🔍 Matching automatique des livres...")
+    print("\n Matching automatique des livres...")
     
     books = db.query(Book).all()
     total_matches = 0
     
     for book in books:
-        # Vérifier si des matches existent déjà
+        # Vrifier si des matches existent dj
         existing = db.query(BookCurriculumMatch).filter(
             BookCurriculumMatch.book_id == book.id
         ).count()
         
         if existing > 0:
-            continue  # Déjà matché
+            continue  # Dj match
         
         # Trouver les correspondances
         matches = match_book_to_recommendations(db, book)
@@ -157,15 +157,15 @@ def auto_match_all_books(db: Session):
                 db.add(match)
                 total_matches += 1
             
-            print(f"✅ {book.title}: {len(matches)} correspondance(s)")
+            print(f" {book.title}: {len(matches)} correspondance(s)")
     
     db.commit()
-    print(f"\n✅ {total_matches} correspondances créées\n")
+    print(f"\n {total_matches} correspondances cres\n")
 
 
 def search_books_by_curriculum(db: Session, curriculum_id: int) -> List[Book]:
     """
-    Rechercher tous les livres recommandés pour un cursus
+    Rechercher tous les livres recommands pour un cursus
     
     Args:
         curriculum_id: ID du cursus
@@ -173,13 +173,13 @@ def search_books_by_curriculum(db: Session, curriculum_id: int) -> List[Book]:
     Returns:
         Liste des livres de la plateforme correspondant au cursus
     """
-    # Récupérer le cursus
+    # Rcuprer le cursus
     curriculum = db.query(Curriculum).filter(Curriculum.id == curriculum_id).first()
     
     if not curriculum:
         return []
     
-    # Récupérer les livres recommandés pour ce cursus
+    # Rcuprer les livres recommands pour ce cursus
     recommended_books = curriculum.recommended_books
     recommended_ids = [rb.id for rb in recommended_books]
     
@@ -189,7 +189,7 @@ def search_books_by_curriculum(db: Session, curriculum_id: int) -> List[Book]:
         BookCurriculumMatch.match_score >= 70
     ).all()
     
-    # Récupérer les livres
+    # Rcuprer les livres
     book_ids = [m.book_id for m in matches]
     books = db.query(Book).filter(Book.id.in_(book_ids)).all()
     

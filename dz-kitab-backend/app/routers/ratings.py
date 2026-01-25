@@ -34,7 +34,7 @@ def get_current_user_id(token: str = Depends(security), db: Session = Depends(ge
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Utilisateur non trouvé"
+            detail="Utilisateur non trouv"
         )
     
     return user.id
@@ -54,7 +54,7 @@ def create_rating(
         if not announcement:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Annonce non trouvée"
+                detail="Annonce non trouve"
             )
         
         seller_id = announcement.user_id
@@ -73,7 +73,7 @@ def create_rating(
         if existing_rating:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Vous avez déjà noté cette annonce"
+                detail="Vous avez dj not cette annonce"
             )
         
         rating = Rating(
@@ -91,12 +91,12 @@ def create_rating(
         db.commit()
         db.refresh(rating)
         
-        # 🔔 NOTIFICATION: Notifier le vendeur de la nouvelle note
+        #  NOTIFICATION: Notifier le vendeur de la nouvelle note
         try:
             notify_new_rating(db, rating)
         except Exception as e:
-            print(f"⚠️ Erreur notification: {e}")
-            # Continue même si la notification échoue
+            print(f" Erreur notification: {e}")
+            # Continue mme si la notification choue
         
         update_seller_stats(db, seller_id)
         
@@ -121,11 +121,11 @@ def create_rating(
     except HTTPException:
         raise
     except Exception as e:
-        print(f"❌ Error creating rating: {e}")
+        print(f" Error creating rating: {e}")
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Erreur lors de la création de la note: {str(e)}"
+            detail=f"Erreur lors de la cration de la note: {str(e)}"
         )
 
 @router.get("/seller/{seller_id}", response_model=RatingListResponse)
@@ -140,7 +140,7 @@ def get_seller_ratings(
     if not seller:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Vendeur non trouvé"
+            detail="Vendeur non trouv"
         )
     
     total = db.query(Rating).filter(Rating.seller_id == seller_id).count()
@@ -181,7 +181,7 @@ def get_seller_stats(seller_id: int, db: Session = Depends(get_db)):
     if not seller:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Vendeur non trouvé"
+            detail="Vendeur non trouv"
         )
     
     stats = db.query(SellerStats).filter(SellerStats.user_id == seller_id).first()
@@ -225,13 +225,13 @@ def update_rating(
     if not rating:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Note non trouvée"
+            detail="Note non trouve"
         )
     
     if rating.buyer_id != buyer_id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Vous n'êtes pas autorisé à modifier cette note"
+            detail="Vous n'tes pas autoris  modifier cette note"
         )
     
     if rating_data.rating is not None:
@@ -280,13 +280,13 @@ def delete_rating(
     if not rating:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Note non trouvée"
+            detail="Note non trouve"
         )
     
     if rating.buyer_id != buyer_id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Vous n'êtes pas autorisé à supprimer cette note"
+            detail="Vous n'tes pas autoris  supprimer cette note"
         )
     
     seller_id = rating.seller_id
@@ -297,7 +297,7 @@ def delete_rating(
     update_seller_stats(db, seller_id)
     
     return {
-        "message": "Note supprimée avec succès",
+        "message": "Note supprime avec succs",
         "rating_id": rating_id
     }
 
@@ -314,5 +314,5 @@ def update_seller_stats(db: Session, seller_id: int):
         db.commit()
         
     except Exception as e:
-        print(f"❌ Error updating seller stats: {e}")
+        print(f" Error updating seller stats: {e}")
         db.rollback()

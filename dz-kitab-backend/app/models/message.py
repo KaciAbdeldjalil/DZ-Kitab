@@ -12,7 +12,7 @@ class MessageStatus(enum.Enum):
     ARCHIVED = "archived"
 
 class Conversation(Base):
-    """Table pour gérer les conversations entre utilisateurs"""
+    """Table pour grer les conversations entre utilisateurs"""
     __tablename__ = "conversations"
 
     id = Column(Integer, primary_key=True, index=True)

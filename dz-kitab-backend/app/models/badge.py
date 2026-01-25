@@ -4,7 +4,7 @@ from app.models.user import User
 class Badge(models.Model):
     nom = models.CharField(max_length=100)
     description = models.TextField()
-    icone = models.CharField(max_length=255, blank=True, null=True)  # URL ou nom d'icône
+    icone = models.CharField(max_length=255, blank=True, null=True)  # URL ou nom d'icne
 
     def __str__(self):
         return self.nom

@@ -32,7 +32,7 @@ def get_current_user(token: str = Depends(security), db: Session = Depends(get_d
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Utilisateur non trouvé"
+            detail="Utilisateur non trouv"
         )
     
     return user
@@ -47,7 +47,7 @@ def get_dashboard_overview(
     current_user: User = Depends(get_current_user)
 ):
     """
-    📊 Get user dashboard overview with key statistics
+     Get user dashboard overview with key statistics
     
     Returns:
     - Total listings (by status)
@@ -128,10 +128,10 @@ def get_dashboard_overview(
         }
         
     except Exception as e:
-        print(f"❌ Error fetching dashboard overview: {e}")
+        print(f" Error fetching dashboard overview: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Erreur lors de la récupération des statistiques"
+            detail="Erreur lors de la rcupration des statistiques"
         )
 
 # ============================================
@@ -145,7 +145,7 @@ def get_sales_overview(
     current_user: User = Depends(get_current_user)
 ):
     """
-    📈 Get sales overview for the last N months
+     Get sales overview for the last N months
     
     Returns monthly data for chart visualization
     """
@@ -224,10 +224,10 @@ def get_sales_overview(
         }
         
     except Exception as e:
-        print(f"❌ Error fetching sales overview: {e}")
+        print(f" Error fetching sales overview: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Erreur lors de la récupération des ventes"
+            detail="Erreur lors de la rcupration des ventes"
         )
 
 # ============================================
@@ -241,7 +241,7 @@ def get_popular_listings(
     current_user: User = Depends(get_current_user)
 ):
     """
-    📚 Get user's most popular listings by views
+     Get user's most popular listings by views
     
     Returns top N announcements sorted by views_count
     """
@@ -287,10 +287,10 @@ def get_popular_listings(
         }
         
     except Exception as e:
-        print(f"❌ Error fetching popular listings: {e}")
+        print(f" Error fetching popular listings: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Erreur lors de la récupération des annonces populaires"
+            detail="Erreur lors de la rcupration des annonces populaires"
         )
 
 # ============================================
@@ -304,7 +304,7 @@ def get_recent_activity(
     current_user: User = Depends(get_current_user)
 ):
     """
-    🕐 Get recent activity (notifications, ratings, sales)
+     Get recent activity (notifications, ratings, sales)
     """
     try:
         activities = []
@@ -334,7 +334,7 @@ def get_recent_activity(
             activities.append({
                 "type": "rating",
                 "title": f"Nouvelle note de {buyer.username if buyer else 'Utilisateur'}",
-                "message": f"{rating.rating} étoiles",
+                "message": f"{rating.rating} toiles",
                 "timestamp": rating.created_at.isoformat(),
                 "rating_value": rating.rating
             })
@@ -348,10 +348,10 @@ def get_recent_activity(
         }
         
     except Exception as e:
-        print(f"❌ Error fetching recent activity: {e}")
+        print(f" Error fetching recent activity: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Erreur lors de la récupération de l'activité"
+            detail="Erreur lors de la rcupration de l'activit"
         )
 
 # ============================================
@@ -364,7 +364,7 @@ def get_profile_settings(
     current_user: User = Depends(get_current_user)
 ):
     """
-    👤 Get user profile information for settings
+     Get user profile information for settings
     """
     return {
         "id": current_user.id,
@@ -385,7 +385,7 @@ def update_profile_settings(
     current_user: User = Depends(get_current_user)
 ):
     """
-    ✏️ Update user profile information
+     Update user profile information
     """
     try:
         # Update allowed fields
@@ -400,7 +400,7 @@ def update_profile_settings(
         db.refresh(current_user)
         
         return {
-            "message": "Profil mis à jour avec succès",
+            "message": "Profil mis  jour avec succs",
             "user": {
                 "id": current_user.id,
                 "username": current_user.username,
@@ -412,11 +412,11 @@ def update_profile_settings(
         }
         
     except Exception as e:
-        print(f"❌ Error updating profile: {e}")
+        print(f" Error updating profile: {e}")
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Erreur lors de la mise à jour du profil"
+            detail="Erreur lors de la mise  jour du profil"
         )
 
 # ============================================
@@ -427,7 +427,7 @@ def update_profile_settings(
 def test_dashboard():
     """Test endpoint to verify dashboard router is working"""
     return {
-        "message": "✅ Dashboard router is working!",
+        "message": " Dashboard router is working!",
         "endpoints": [
             "GET /api/dashboard/overview - Main dashboard stats",
             "GET /api/dashboard/sales-overview - Monthly sales chart",

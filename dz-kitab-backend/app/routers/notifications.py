@@ -28,7 +28,7 @@ def get_current_user_id(token: str = Depends(security), db: Session = Depends(ge
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Utilisateur non trouvé"
+            detail="Utilisateur non trouv"
         )
     
     return user.id
@@ -88,10 +88,10 @@ def get_my_notifications(
         }
         
     except Exception as e:
-        print(f"❌ Error fetching notifications: {e}")
+        print(f" Error fetching notifications: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Erreur lors de la récupération des notifications"
+            detail="Erreur lors de la rcupration des notifications"
         )
 
 @router.get("/unread-count", status_code=status.HTTP_200_OK)
@@ -109,7 +109,7 @@ def get_unread_count(
         return {"unread_count": count}
         
     except Exception as e:
-        print(f"❌ Error getting unread count: {e}")
+        print(f" Error getting unread count: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Erreur lors du comptage des notifications"
@@ -135,7 +135,7 @@ def mark_as_read(
         if not notification:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Notification non trouvée"
+                detail="Notification non trouve"
             )
         
         if not notification.is_read:
@@ -144,18 +144,18 @@ def mark_as_read(
             db.commit()
         
         return {
-            "message": "Notification marquée comme lue",
+            "message": "Notification marque comme lue",
             "notification_id": notification_id
         }
         
     except HTTPException:
         raise
     except Exception as e:
-        print(f"❌ Error marking notification as read: {e}")
+        print(f" Error marking notification as read: {e}")
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Erreur lors de la mise à jour"
+            detail="Erreur lors de la mise  jour"
         )
 
 @router.put("/read-all", status_code=status.HTTP_200_OK)
@@ -176,16 +176,16 @@ def mark_all_as_read(
         db.commit()
         
         return {
-            "message": "Toutes les notifications ont été marquées comme lues",
+            "message": "Toutes les notifications ont t marques comme lues",
             "count": updated
         }
         
     except Exception as e:
-        print(f"❌ Error marking all as read: {e}")
+        print(f" Error marking all as read: {e}")
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Erreur lors de la mise à jour"
+            detail="Erreur lors de la mise  jour"
         )
 
 # ============================================
@@ -208,21 +208,21 @@ def delete_notification(
         if not notification:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Notification non trouvée"
+                detail="Notification non trouve"
             )
         
         db.delete(notification)
         db.commit()
         
         return {
-            "message": "Notification supprimée",
+            "message": "Notification supprime",
             "notification_id": notification_id
         }
         
     except HTTPException:
         raise
     except Exception as e:
-        print(f"❌ Error deleting notification: {e}")
+        print(f" Error deleting notification: {e}")
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -244,12 +244,12 @@ def delete_all_read_notifications(
         db.commit()
         
         return {
-            "message": "Notifications lues supprimées",
+            "message": "Notifications lues supprimes",
             "count": deleted
         }
         
     except Exception as e:
-        print(f"❌ Error deleting notifications: {e}")
+        print(f" Error deleting notifications: {e}")
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -289,10 +289,10 @@ def get_notification_preferences(
         }
         
     except Exception as e:
-        print(f"❌ Error getting preferences: {e}")
+        print(f" Error getting preferences: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Erreur lors de la récupération des préférences"
+            detail="Erreur lors de la rcupration des prfrences"
         )
 
 @router.put("/preferences", status_code=status.HTTP_200_OK)
@@ -330,7 +330,7 @@ def update_notification_preferences(
         db.commit()
         
         return {
-            "message": "Préférences mises à jour",
+            "message": "Prfrences mises  jour",
             "preferences": {
                 "email_new_rating": prefs.email_new_rating,
                 "email_rating_reply": prefs.email_rating_reply,
@@ -343,11 +343,11 @@ def update_notification_preferences(
         }
         
     except Exception as e:
-        print(f"❌ Error updating preferences: {e}")
+        print(f" Error updating preferences: {e}")
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Erreur lors de la mise à jour"
+            detail="Erreur lors de la mise  jour"
         )
 
 @router.get("/test")

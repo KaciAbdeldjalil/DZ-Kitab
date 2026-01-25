@@ -9,34 +9,34 @@ import enum
 class BookConditionEnum(str, enum.Enum):
     NEUF = "Neuf"
     COMME_NEUF = "Comme neuf"
-    BON_ETAT = "Bon état"
-    ETAT_ACCEPTABLE = "État acceptable"
-    USAGE = "Usagé"
+    BON_ETAT = "Bon tat"
+    ETAT_ACCEPTABLE = "tat acceptable"
+    USAGE = "Usag"
 
 class AnnouncementStatusEnum(str, enum.Enum):
     ACTIVE = "Active"
     VENDU = "Vendu"
-    RESERVE = "Réservé"
-    DESACTIVE = "Désactivé"
+    RESERVE = "Rserv"
+    DESACTIVE = "Dsactiv"
 
 class BookCategoryEnum(str, enum.Enum):
     INFORMATIQUE = "Informatique"
-    MATHEMATIQUES = "Mathématiques"
+    MATHEMATIQUES = "Mathmatiques"
     PHYSIQUE = "Physique"
     CHIMIE = "Chimie"
     BIOLOGIE = "Biologie"
-    MEDECINE = "Médecine"
-    ECONOMIE = "Économie"
+    MEDECINE = "Mdecine"
+    ECONOMIE = "conomie"
     GESTION = "Gestion"
     DROIT = "Droit"
     LANGUES = "Langues"
-    LITTERATURE = "Littérature"
+    LITTERATURE = "Littrature"
     HISTOIRE = "Histoire"
-    GEOGRAPHIE = "Géographie"
+    GEOGRAPHIE = "Gographie"
     PHILOSOPHIE = "Philosophie"
     PSYCHOLOGIE = "Psychologie"
     ARCHITECTURE = "Architecture"
-    INGENIERIE = "Ingénierie"
+    INGENIERIE = "Ingnierie"
     AUTRE = "Autre"
 
 
@@ -50,7 +50,7 @@ class Book(Base):
     subtitle = Column(String, nullable=True)
     authors = Column(String, nullable=True)
     publisher = Column(String, nullable=True)
-    published_date = Column(String, nullable=True)  # Année de publication
+    published_date = Column(String, nullable=True)  # Anne de publication
     description = Column(Text, nullable=True)
     page_count = Column(Integer, nullable=True)  # Nombre de pages du livre
     categories = Column(String, nullable=True)
@@ -76,24 +76,24 @@ class Announcement(Base):
     
     # Prix et condition
     price = Column(Float, nullable=False)
-    market_price = Column(Float, nullable=True)  # Prix du marché pour référence
-    final_calculated_price = Column(Float, nullable=True)  # Prix final calculé avec le score de condition
+    market_price = Column(Float, nullable=True)  # Prix du march pour rfrence
+    final_calculated_price = Column(Float, nullable=True)  # Prix final calcul avec le score de condition
     condition = Column(Enum(BookConditionEnum), nullable=False)
     
-    # Catégorie choisie par l'utilisateur
+    # Catgorie choisie par l'utilisateur
     category = Column(Enum(BookCategoryEnum), nullable=False)
     
     # Statut
     status = Column(Enum(AnnouncementStatusEnum), default=AnnouncementStatusEnum.ACTIVE)
     
-    # Détails
+    # Dtails
     description = Column(Text, nullable=True)
     custom_images = Column(String, nullable=True)
     location = Column(String, nullable=True)
     
-    # Informations sur le livre (peut être différent de Book si l'utilisateur le modifie)
-    page_count = Column(Integer, nullable=True)  # Nombre de pages saisi/modifié par l'utilisateur
-    publication_date = Column(String, nullable=True)  # Date de publication saisie/modifiée
+    # Informations sur le livre (peut tre diffrent de Book si l'utilisateur le modifie)
+    page_count = Column(Integer, nullable=True)  # Nombre de pages saisi/modifi par l'utilisateur
+    publication_date = Column(String, nullable=True)  # Date de publication saisie/modifie
     
     # Statistiques
     views_count = Column(Integer, default=0)

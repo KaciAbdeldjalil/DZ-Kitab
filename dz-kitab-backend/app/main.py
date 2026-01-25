@@ -38,17 +38,17 @@ def wait_for_db(database_url: str, retries: int = 10, delay: int = 3):
     for i in range(retries):
         try:
             with temp_engine.connect():
-                print("✅ Database is ready!")
+                print("Database is ready!")
                 return
         except OperationalError:
-            print(f"⏳ Waiting for DB... attempt {i + 1}/{retries}")
+            print(f"Waiting for DB... attempt {i + 1}/{retries}")
             time.sleep(delay)
-    raise Exception("❌ Database not available after several retries.")
+    raise Exception("Database not available after several retries.")
 
 # Wait for database
 wait_for_db(DATABASE_URL)
 
-print("🚀 Starting application...")
+print("Starting application...")
 
 # Setup logging
 setup_logging()
@@ -61,8 +61,8 @@ Base.metadata.create_all(bind=engine)
 # ===============================
 app = FastAPI(
     title="DZ-Kitab API",
-    version="2.1.0",  # Version mise à jour
-    description="API pour la plateforme d'échange de livres universitaires avec système de recommandations par cursus",
+    version="2.1.0",  # Version mise  jour
+    description="API pour la plateforme d'change de livres universitaires avec systme de recommandations par cursus",
     docs_url="/docs",
     redoc_url="/redoc"
 )
@@ -122,17 +122,17 @@ def read_root():
         "documentation": "/docs",
         "status": "operational",
         "features": [
-            "✅ Authentification JWT",
-            "✅ Upload d'images",
-            "✅ Intégration Google Books API",
-            "✅ Système d'évaluation de condition",
-            "✅ Système de notation vendeurs",
-            "✅ Notifications en temps réel",
-            "✅ Suspension automatique",
-            "✅ Recommandations par domaine",
-            "✅ Web Scraping & Badges Cursus",  # NOUVEAU
-            "✅ Gestion d'erreurs avancée",
-            "✅ CORS configuré"
+            " Authentification JWT",
+            " Upload d'images",
+            " Intgration Google Books API",
+            " Systme d'valuation de condition",
+            " Systme de notation vendeurs",
+            " Notifications en temps rel",
+            " Suspension automatique",
+            " Recommandations par domaine",
+            " Web Scraping & Badges Cursus",  # NOUVEAU
+            " Gestion d'erreurs avance",
+            " CORS configur"
         ],
         "endpoints": {
             "auth": "/auth/*",
@@ -203,22 +203,22 @@ def get_stats():
 
 @app.on_event("startup")
 async def startup_event():
-    """Actions au démarrage de l'application"""
+    """Actions au dmarrage de l'application"""
     print("=" * 60)
-    print("🎉 DZ-Kitab API Started Successfully!")
+    print("DZ-Kitab API Started Successfully!")
     print("=" * 60)
-    print(f"📝 Documentation: http://localhost:8000/docs")
-    print(f"🔍 Health Check: http://localhost:8000/health")
-    print(f"📊 Statistics: http://localhost:8000/stats")
-    print(f"🎯 Recommendations: http://localhost:8000/api/recommendations/test")
-    print(f"📚 Curriculum: http://localhost:8000/api/curriculum/test")  # NOUVEAU
+    print(f"Documentation: http://localhost:8000/docs")
+    print(f"Health Check: http://localhost:8000/health")
+    print(f"Statistics: http://localhost:8000/stats")
+    print(f"Recommendations: http://localhost:8000/api/recommendations/test")
+    print(f"Curriculum: http://localhost:8000/api/curriculum/test")  # NOUVEAU
     print("=" * 60)
     
 @app.on_event("shutdown")
 async def shutdown_event():
-    """Actions à l'arrêt de l'application"""
+    """Actions  l'arrt de l'application"""
     print("\n" + "=" * 60)
-    print("👋 DZ-Kitab API Shutting Down...")
+    print("DZ-Kitab API Shutting Down...")
     print("=" * 60)
 
-print("✅ Application ready! Access: http://localhost:8000/docs")
+print("Application ready! Access: http://localhost:8000/docs")

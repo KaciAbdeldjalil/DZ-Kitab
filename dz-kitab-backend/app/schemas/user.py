@@ -33,7 +33,7 @@ class UserCreate(BaseModel):
     def validate_password(cls, v):
         """Validate password strength"""
         if len(v) < 8:
-            raise ValueError('Le mot de passe doit contenir au moins 8 caractères')
+            raise ValueError('Le mot de passe doit contenir au moins 8 caractres')
         
         # Check for at least one uppercase, one lowercase, one digit
         if not re.search(r'[A-Z]', v):
@@ -65,7 +65,7 @@ class UserCreate(BaseModel):
         
         if not any(re.match(pattern, clean_phone) for pattern in patterns):
             raise ValueError(
-                'Numéro de téléphone invalide. Format attendu: +213XXXXXXXXX ou 0XXXXXXXXX'
+                'Numro de tlphone invalide. Format attendu: +213XXXXXXXXX ou 0XXXXXXXXX'
             )
         
         # Normalize to +213 format
@@ -82,7 +82,7 @@ class UserCreate(BaseModel):
         
         valid_universities = ['ESTIN', 'ESI', 'EPAU', 'USTHB']
         if v.upper() not in valid_universities:
-            raise ValueError(f'Université invalide. Choisissez parmi: {", ".join(valid_universities)}')
+            raise ValueError(f'Universit invalide. Choisissez parmi: {", ".join(valid_universities)}')
         
         return v.upper()
     
@@ -96,7 +96,7 @@ class UserCreate(BaseModel):
         v = ' '.join(v.split())
         
         # Check for valid characters (letters, spaces, hyphens, apostrophes)
-        if not re.match(r'^[a-zA-ZÀ-ÿ\s\-\']+$', v):
+        if not re.match(r'^[a-zA-Z-\s\-\']+$', v):
             raise ValueError('Le nom ne peut contenir que des lettres, espaces, traits d\'union et apostrophes')
         
         return v.strip()

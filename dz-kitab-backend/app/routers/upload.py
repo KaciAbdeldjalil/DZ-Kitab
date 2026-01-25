@@ -35,14 +35,14 @@ def validate_image_file(file: UploadFile) -> None:
     if file_ext not in ALLOWED_EXTENSIONS:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Extension de fichier non autorisée"
+            detail="Extension de fichier non autorise"
         )
 
     # MIME type check
     if file.content_type not in ALLOWED_MIME_TYPES:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Type MIME non autorisé"
+            detail="Type MIME non autoris"
         )
 
     # File size check
@@ -76,7 +76,7 @@ def validate_image_file(file: UploadFile) -> None:
     if image_format not in ALLOWED_IMAGE_FORMATS:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Format d’image non supporté"
+            detail="Format dimage non support"
         )
 
 
@@ -100,7 +100,7 @@ async def upload_book_image(
         shutil.copyfileobj(file.file, buffer)
 
     return {
-        "message": "Image uploadée avec succès",
+        "message": "Image uploade avec succs",
         "filename": unique_filename,
         "url": f"/uploads/books/{unique_filename}",
         "size": os.path.getsize(file_path)
@@ -115,7 +115,7 @@ async def upload_multiple_images(
     if len(files) > MAX_FILES_PER_UPLOAD:
         raise HTTPException(
             status_code=400,
-            detail=f"Maximum {MAX_FILES_PER_UPLOAD} fichiers autorisés"
+            detail=f"Maximum {MAX_FILES_PER_UPLOAD} fichiers autoriss"
         )
 
     uploaded, errors = [], []
@@ -157,16 +157,16 @@ async def delete_image(
     file_path = UPLOAD_DIR / safe_filename
 
     if not file_path.exists():
-        raise HTTPException(status_code=404, detail="Image non trouvée")
+        raise HTTPException(status_code=404, detail="Image non trouve")
 
     os.remove(file_path)
 
     return {
-        "message": "Image supprimée avec succès",
+        "message": "Image supprime avec succs",
         "filename": safe_filename
     }
 
 
 @router.get("/test")
 def test_upload():
-    return {"message": "Upload router is working ✅"}
+    return {"message": "Upload router is working "}

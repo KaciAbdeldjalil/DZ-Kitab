@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import './messages.css';
 import { CiSearch } from "react-icons/ci";
 import api from "../utils/api";
 const Messages = () => {
+    const [searchParams] = useSearchParams();
+    const conversationIdFromUrl = searchParams.get('conversationId');
+
     const [activeChat, setActiveChat] = useState(null); // Use conversation ID or Object
     const [newMessage, setNewMessage] = useState('');
     const [conversations, setConversations] = useState([]);
@@ -14,9 +18,20 @@ const Messages = () => {
         const fetchConversations = async () => {
             try {
                 const res = await api.get('/api/messages/conversations');
-                setConversations(res.data.conversations);
-                if (res.data.conversations.length > 0) {
-                    setActiveChat(res.data.conversations[0]); // Select first chat by default
+                const convs = res.data.conversations;
+                setConversations(convs);
+
+                if (convs.length > 0) {
+                    if (conversationIdFromUrl) {
+                        const targetConv = convs.find(c => c.id === parseInt(conversationIdFromUrl));
+                        if (targetConv) {
+                            setActiveChat(targetConv);
+                        } else {
+                            setActiveChat(convs[0]);
+                        }
+                    } else {
+                        setActiveChat(convs[0]); // Select first chat by default
+                    }
                 }
             } catch (error) {
                 console.error("Error fetching conversations:", error);
@@ -25,7 +40,7 @@ const Messages = () => {
             }
         };
         fetchConversations();
-    }, []);
+    }, [conversationIdFromUrl]);
 
     // Fetch messages when activeChat changes
     useEffect(() => {
@@ -47,15 +62,18 @@ const Messages = () => {
         if (!newMessage.trim() || !activeChat) return;
 
         try {
+            console.log(`Sending message to conversation ${activeChat.id}: ${newMessage}`);
             const res = await api.post(`/api/messages/conversations/${activeChat.id}/messages`, null, {
                 params: { content: newMessage }
             });
+            console.log("Message response:", res.data);
             // Add new message to UI immediately
             setMessages([...messages, res.data]);
             setNewMessage('');
         } catch (error) {
-            console.error("Error sending message:", error);
-            alert("Failed to send message");
+            console.error("Error sending message:", error.response?.data || error.message);
+            const errorDetail = error.response?.data?.detail;
+            alert("Failed to send message:\n" + (errorDetail || error.message));
         }
     };
 

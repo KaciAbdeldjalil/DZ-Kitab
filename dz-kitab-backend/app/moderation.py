@@ -1,5 +1,5 @@
 # moderation.py
-# Fonction simple de modération de contenu
+# Fonction simple de modration de contenu
 
 BANNED_WORDS = [
     "insulte1", "insulte2", "spam", "interdit"
@@ -7,7 +7,7 @@ BANNED_WORDS = [
 
 def is_content_safe(text):
     """
-    Vérifie si le texte contient des mots interdits
+    Vrifie si le texte contient des mots interdits
     Retourne True si le contenu est safe, False sinon
     """
     text_lower = text.lower()

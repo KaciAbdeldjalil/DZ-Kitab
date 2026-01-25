@@ -14,34 +14,34 @@ class UserMiniResponse(BaseModel):
 class BookCondition(str, Enum):
     NEUF = "Neuf"
     COMME_NEUF = "Comme neuf"
-    BON_ETAT = "Bon état"
-    ETAT_ACCEPTABLE = "État acceptable"
-    USAGE = "Usagé"
+    BON_ETAT = "Bon tat"
+    ETAT_ACCEPTABLE = "tat acceptable"
+    USAGE = "Usag"
 
 class AnnouncementStatus(str, Enum):
     ACTIVE = "Active"
     VENDU = "Vendu"
-    RESERVE = "Réservé"
-    DESACTIVE = "Désactivé"
+    RESERVE = "Rserv"
+    DESACTIVE = "Dsactiv"
 
 class BookCategory(str, Enum):
     INFORMATIQUE = "Informatique"
-    MATHEMATIQUES = "Mathématiques"
+    MATHEMATIQUES = "Mathmatiques"
     PHYSIQUE = "Physique"
     CHIMIE = "Chimie"
     BIOLOGIE = "Biologie"
-    MEDECINE = "Médecine"
-    ECONOMIE = "Économie"
+    MEDECINE = "Mdecine"
+    ECONOMIE = "conomie"
     GESTION = "Gestion"
     DROIT = "Droit"
     LANGUES = "Langues"
-    LITTERATURE = "Littérature"
+    LITTERATURE = "Littrature"
     HISTOIRE = "Histoire"
-    GEOGRAPHIE = "Géographie"
+    GEOGRAPHIE = "Gographie"
     PHILOSOPHIE = "Philosophie"
     PSYCHOLOGIE = "Psychologie"
     ARCHITECTURE = "Architecture"
-    INGENIERIE = "Ingénierie"
+    INGENIERIE = "Ingnierie"
     AUTRE = "Autre"
 
 class GoogleBookInfo(BaseModel):
@@ -84,15 +84,15 @@ class BookResponse(BookBase):
 
 class AnnouncementCreate(BaseModel):
     isbn: str = Field(..., description="ISBN du livre")
-    category: BookCategory = Field(..., description="Catégorie du livre")
+    category: BookCategory = Field(..., description="Catgorie du livre")
     price: float = Field(..., gt=0, description="Prix de vente en DZD")
-    market_price: Optional[float] = Field(None, gt=0, description="Prix du marché en DZD")
+    market_price: Optional[float] = Field(None, gt=0, description="Prix du march en DZD")
     condition: BookCondition
     description: Optional[str] = Field(None, max_length=1000)
     location: Optional[str] = Field(None, max_length=200)
     custom_images: Optional[List[str]] = None
     page_count: Optional[int] = Field(None, gt=0, description="Nombre de pages")
-    publication_date: Optional[str] = Field(None, description="Date/Année de publication")
+    publication_date: Optional[str] = Field(None, description="Date/Anne de publication")
     
     # Optional fields for manual book entry if Google Books fails
     title: Optional[str] = None
@@ -161,8 +161,8 @@ class ISBNLookupResponse(BaseModel):
     message: Optional[str] = None
 
 class PriceCalculationResponse(BaseModel):
-    """Réponse du calcul du prix final avec le score de condition"""
+    """Rponse du calcul du prix final avec le score de condition"""
     market_price: float
     condition_score: float  # Score en pourcentage (0-100)
-    calculated_price: float  # Prix final calculé
-    price_breakdown: dict  # Détails du calcul
+    calculated_price: float  # Prix final calcul
+    price_breakdown: dict  # Dtails du calcul
