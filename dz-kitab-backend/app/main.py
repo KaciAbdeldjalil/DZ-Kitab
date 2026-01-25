@@ -28,36 +28,27 @@ from app.core.cors import configure_cors, add_cors_debug_middleware
 from app.core.logging_config import setup_logging, RequestLoggingMiddleware
 import app.models
 
-Base.metadata.create_all(bind=engine)
+import app.models
 
 # ===============================
-# WAIT FOR DATABASE
+# STARTUP
 # ===============================
-def wait_for_db(database_url: str, retries: int = 10, delay: int = 3):
-    temp_engine = create_engine(database_url)
-    for i in range(retries):
-        try:
-            with temp_engine.connect():
-                print("Database is ready!")
-                return
-        except OperationalError:
-            print(f"Waiting for DB... attempt {i + 1}/{retries}")
-            time.sleep(delay)
-    raise Exception("Database not available after several retries.")
-
-# Wait for database
-wait_for_db(DATABASE_URL)
-
-print("Starting application...")
 
 # Setup logging
 setup_logging()
 
-# Create all tables
-Base.metadata.create_all(bind=engine)
+# Create all tables (one time, non-blocking if possible)
+try:
+    print("Creating database tables...")
+    Base.metadata.create_all(bind=engine)
+    print("Database tables created successfully!")
+except Exception as e:
+    print(f"Warning: Database initialization error: {e}")
+    # Don't raise here, allow the app to try and start
 
 # ===============================
 # CREATE FASTAPI APP
+
 # ===============================
 app = FastAPI(
     title="DZ-Kitab API",
@@ -68,19 +59,20 @@ app = FastAPI(
 )
 
 # ===============================
-# CONFIGURE CORS
-# ===============================
-configure_cors(app)
-add_cors_debug_middleware(app)
-
-# ===============================
 # ADD MIDDLEWARES
 # ===============================
 app.add_middleware(RequestLoggingMiddleware)
 
 # ===============================
+# CONFIGURE CORS (Must be added last to run first)
+# ===============================
+configure_cors(app)
+add_cors_debug_middleware(app)
+
+# ===============================
 # REGISTER EXCEPTION HANDLERS
 # ===============================
+
 app.add_exception_handler(DZKitabException, dzkitab_exception_handler)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
 app.add_exception_handler(IntegrityError, integrity_error_handler)

@@ -10,11 +10,26 @@ def get_allowed_origins() -> List[str]:
     Rcuprer les origines autorises selon l'environnement
     """
     environment = os.getenv("ENVIRONMENT", "development")
+    allowed_origins_raw = os.getenv("ALLOWED_ORIGINS", "")
+    
+    # Base origins toujours autorisables
+    base_origins = [
+        "https://dz-kitab-frontend.vercel.app",
+        "https://dz-kitab-frontend-abdeldjalil-kacis-projects.vercel.app"
+    ]
     
     if environment == "production":
-        # En production, utiliser uniquement les domaines configurs
-        origins = os.getenv("ALLOWED_ORIGINS", "").split(",")
-        return [origin.strip() for origin in origins if origin.strip()]
+        # En production, utiliser les domaines configurs + base_origins
+        origins = allowed_origins_raw.split(",")
+        result = [origin.strip() for origin in origins if origin.strip()]
+        
+        # Ajouter les domaines Vercel par dfaut si non prsents
+        for bo in base_origins:
+            if bo not in result:
+                result.append(bo)
+        
+        print(f"DEBUG: Production Origins: {result}")
+        return result
     else:
         # En dveloppement, autoriser localhost et 127.0.0.1
         return [
@@ -27,6 +42,7 @@ def get_allowed_origins() -> List[str]:
             "http://0.0.0.0:3000",
             "http://0.0.0.0:5173",
         ]
+
 
 def configure_cors(app: FastAPI) -> None:
     """

@@ -1,39 +1,28 @@
-# requirements.txt
-
 # FastAPI and server
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
-Django>=4.2.10
+python-multipart==0.0.6
+
 # Database
 sqlalchemy==2.0.23
 psycopg2-binary==2.9.9
 
-# Authentication - FIXED VERSIONS
+# Authentication
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 bcrypt==3.2.0
 
-python-multipart==0.0.6
-
-# HTTP Client for Google Books API
+# HTTP Client
 httpx==0.25.1
 
-# Pydantic for validation
+# Pydantic
 pydantic[email]==2.5.0
-# Dépendances existantes...
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-sqlalchemy==2.0.23
-psycopg2-binary==2.9.9
-python-jose[cryptography]==3.3.0
-passlib[bcrypt]==1.7.4
-python-multipart==0.0.6
-httpx==0.25.1
-pydantic[email]==2.5.0
+
+# Utils
 Pillow
-
 requests
 beautifulsoup4
 pandas
+python-dotenv
 
 

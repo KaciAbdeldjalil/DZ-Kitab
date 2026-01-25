@@ -45,21 +45,25 @@ from sqlalchemy.orm import sessionmaker
 import os
 from dotenv import load_dotenv
 
-# Charger les variables d'environnement
-load_dotenv()
+# Charger les variables d'environnement seulement en dveloppement
+if os.getenv("ENVIRONMENT") != "production":
+    load_dotenv()
 
-# MySQL connection details (InfinityFree)
-DB_USER = "if0_40781999"
-DB_PASSWORD = "ZElY0rtAdL"
-DB_NAME = "if0_40781999_dz_kitab"  # Replace XXX with your actual DB name
-DB_HOST = "sql312.infinityfree.com"
-DB_PORT = "3306"
+# URL de connexion - Priorit absolue  la variable d'environnement
+DATABASE_URL = os.getenv("DATABASE_URL")
 
-# URL de connexion MySQL
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-)
+# Fallback pour le dveloppement local seulement
+if not DATABASE_URL:
+    # MySQL connection details (InfinityFree) - Backup defaults
+    DB_USER = "if0_40781999"
+    DB_PASSWORD = "ZElY0rtAdL"
+    DB_NAME = "if0_40781999_dz_kitab"
+    DB_HOST = "sql312.infinityfree.com"
+    DB_PORT = "3306"
+    DATABASE_URL = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+
+print(f"DEBUG: Database connection target identified (type: {'Postgres' if 'postgres' in DATABASE_URL.lower() else 'Other'})")
+
 
 # Crer le moteur SQLAlchemy
 if DATABASE_URL.startswith("sqlite"):

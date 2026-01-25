@@ -17,42 +17,52 @@ def setup_logging():
     """
     Configurer le systme de logging
     """
-    # Crer le dossier logs
-    log_dir = Path("logs")
-    log_dir.mkdir(exist_ok=True)
-    
+    import os
+    is_production = os.getenv("ENVIRONMENT") == "production" or os.getenv("VERCEL") == "1"
+
     # Format du log
     log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     date_format = "%Y-%m-%d %H:%M:%S"
     
+    handlers = [logging.StreamHandler(sys.stdout)]
+    
+    if not is_production:
+        # Crer le dossier logs
+        log_dir = Path("logs")
+        log_dir.mkdir(exist_ok=True)
+        
+        handlers.append(
+            logging.FileHandler(
+                log_dir / f"dzkitab_{datetime.now().strftime('%Y%m%d')}.log"
+            )
+        )
+        handlers.append(
+            logging.FileHandler(
+                log_dir / f"errors_{datetime.now().strftime('%Y%m%d')}.log"
+            )
+        )
+
     # Configuration du logger racine
     logging.basicConfig(
         level=logging.INFO,
         format=log_format,
         datefmt=date_format,
-        handlers=[
-            # Console handler
-            logging.StreamHandler(sys.stdout),
-            # File handler - tous les logs
-            logging.FileHandler(
-                log_dir / f"dzkitab_{datetime.now().strftime('%Y%m%d')}.log"
-            ),
-            # File handler - erreurs seulement
-            logging.FileHandler(
-                log_dir / f"errors_{datetime.now().strftime('%Y%m%d')}.log"
-            )
-        ]
+        handlers=handlers
     )
     
-    # Configurer le niveau pour le handler d'erreurs
-    error_handler = logging.getLogger().handlers[2]
-    error_handler.setLevel(logging.ERROR)
+    if not is_production:
+        # Configurer le niveau pour le handler d'erreurs
+        error_handler = logging.getLogger().handlers[2]
+        error_handler.setLevel(logging.ERROR)
     
     # Logger spcifiques
     logging.getLogger("uvicorn.access").setLevel(logging.WARNING)
     logging.getLogger("sqlalchemy.engine").setLevel(logging.WARNING)
     
-    print(f" Logging configur - Dossier: {log_dir.absolute()}")
+    if not is_production:
+        log_dir = Path("logs")
+        print(f" Logging configur - Dossier: {log_dir.absolute()}")
+
 
 # ============================================
 # MIDDLEWARE DE LOGGING
