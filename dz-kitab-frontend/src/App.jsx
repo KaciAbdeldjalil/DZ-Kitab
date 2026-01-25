@@ -72,6 +72,11 @@ export default function App() {
             <AddAnnounce />
           </PrivateRoute>
         } />
+        <Route path="/edit/:id" element={
+          <PrivateRoute>
+            <AddAnnounce />
+          </PrivateRoute>
+        } />
         <Route path="/dashboard" element={
           <PrivateRoute>
             <Dashboard />

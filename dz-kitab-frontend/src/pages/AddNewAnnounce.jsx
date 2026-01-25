@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import api from '../utils/api';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import './addnewannouce.css';
 import { FaSearch, FaBook, FaCheckCircle, FaCamera, FaRobot, FaArrowRight, FaArrowLeft, FaBarcode, FaUpload } from 'react-icons/fa';
 import { MdVerified, MdWarning } from 'react-icons/md';
 
 function AddAnnounce() {
     const navigate = useNavigate();
+    const { id } = useParams(); // Get ID for edit mode
+    const isEditMode = !!id;
+
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
 
@@ -79,6 +82,61 @@ function AddAnnounce() {
         };
         fetchCategories();
     }, []);
+
+    // Fetch existing announcement for editing
+    useEffect(() => {
+        if (isEditMode) {
+            const fetchAnnouncement = async () => {
+                setLoading(true);
+                try {
+                    const response = await api.get(`/api/books/announcements/${id}`);
+                    const data = response.data;
+                    const book = data.book;
+
+                    // Pre-fill State
+                    setIsbn(book.isbn);
+                    setBookDetails({
+                        title: book.title,
+                        authors: book.authors ? book.authors.split(', ') : [],
+                        pageCount: data.page_count || book.page_count,
+                        publishedDate: data.publication_date || book.published_date,
+                        categories: book.categories ? book.categories.split(', ') : [],
+                        description: data.description || book.description,
+                        thumbnail: book.cover_image_url,
+                        publisher: book.publisher,
+                        basePrice: data.market_price || '',
+                        selectedCategory: data.category
+                    });
+
+                    // Pre-fill Photos (convert URL to preview object for UI consistency)
+                    if (data.custom_images) {
+                        const images = data.custom_images.split(',').map(url => ({
+                            preview: `http://localhost:8000${url}`, // Assuming local backend, ideally use env
+                            existing: true, // Flag to avoid re-uploading if logic requires
+                            url: url
+                        }));
+                        setPhotos(images);
+                    }
+
+                    // Reverse engineer score? Or just set a default/calculated one?
+                    // Since we don't store raw score, we might need to assume or reset.
+                    // For now, let's keep score editable or set based on condition string logic if possible.
+                    // Simplified: We assume condition score is recalculated or user re-evaluates.
+
+                    // Force Step 2 to review details
+                    setBookFound(true);
+                    // setStep(2); // Optional: Auto jump or let user review step 1
+                } catch (error) {
+                    console.error("Error fetching announcement:", error);
+                    alert("Failed to load announcement for editing.");
+                    navigate('/myannouncements');
+                } finally {
+                    setLoading(false);
+                }
+            };
+            fetchAnnouncement();
+        }
+    }, [id, isEditMode, navigate]);
 
     const fetchBookDetailsByISBN = async () => {
         if (!isbn) return;
@@ -242,18 +300,28 @@ function AddAnnounce() {
                 return;
             }
 
-            // 1. Upload custom photos
+            // 1. Upload custom photos (Only new ones)
             const uploadedImageUrls = [];
+
+            // Keep existing photos
+            if (isEditMode) {
+                photos.forEach(p => {
+                    if (p.existing) uploadedImageUrls.push(p.url);
+                });
+            }
+
             for (const photo of photos) {
-                const formData = new FormData();
-                formData.append('file', photo.file);
-                try {
-                    const uploadRes = await api.post('/api/images/upload', formData, {
-                        headers: { 'Content-Type': 'multipart/form-data' }
-                    });
-                    uploadedImageUrls.push(uploadRes.data.url);
-                } catch (err) {
-                    console.error("Error uploading image:", err);
+                if (!photo.existing) {
+                    const formData = new FormData();
+                    formData.append('file', photo.file);
+                    try {
+                        const uploadRes = await api.post('/api/images/upload', formData, {
+                            headers: { 'Content-Type': 'multipart/form-data' }
+                        });
+                        uploadedImageUrls.push(uploadRes.data.url);
+                    } catch (err) {
+                        console.error("Error uploading image:", err);
+                    }
                 }
             }
 
@@ -290,9 +358,15 @@ function AddAnnounce() {
                 cover_image_url: finalThumbnail
             };
 
-            await api.post("/api/books/announcements", finalData);
-            alert(`Announcement Created for ${calculatedPrice} DZD!`);
-            navigate('/catalog');
+            if (isEditMode) {
+                await api.put(`/api/books/announcements/${id}`, finalData);
+                alert("Announcement Updated Successfully!");
+                navigate('/myannouncements');
+            } else {
+                await api.post("/api/books/announcements", finalData);
+                alert(`Announcement Created for ${calculatedPrice} DZD!`);
+                navigate('/catalog');
+            }
         } catch (error) {
             console.error("Submission error details:", error.response?.data);
             const errorMsg = error.response?.data?.detail;
@@ -310,7 +384,7 @@ function AddAnnounce() {
 
     return (
         <div className="add-announce-container">
-            <h1 className="page-title text-[#134BD7] ">Sell Your Book</h1>
+            <h1 className="page-title text-[#134BD7] ">{isEditMode ? 'Edit Announcement' : 'Sell Your Book'}</h1>
 
             <div className="stepper-wrapper">
                 <div className={`step-item ${step >= 1 ? 'completed' : ''} ${step === 1 ? 'active' : ''}`}>
@@ -684,7 +758,9 @@ function AddAnnounce() {
 
                         <div className="  flex justify-between items-center gap-10  ">
                             <button className=" back-button flex items-center gap-2 bg-[#134BD7] text-white rounded-md w-50 h-15 font-medium cursor-pointer " onClick={() => setStep(2)}><FaArrowLeft /> Back</button>
-                            <button className="btn-submit w-100 h-15 bg-[#F3A109] " onClick={handleSubmit}>Publish Announcement</button>
+                            <button className="btn-submit w-100 h-15 bg-[#F3A109] " onClick={handleSubmit}>
+                                {isEditMode ? 'Update Announcement' : 'Publish Announcement'}
+                            </button>
                         </div>
                     </div>
                 )}
