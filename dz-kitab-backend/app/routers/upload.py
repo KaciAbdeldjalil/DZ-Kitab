@@ -22,7 +22,8 @@ MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 MB
 MIN_FILE_SIZE = 1024  # 1 KB
 MAX_FILES_PER_UPLOAD = 5
 
-UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+# Removed top-level mkdir to prevent crash on Vercel (read-only filesystem)
+# UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def validate_image_file(file: UploadFile) -> None:

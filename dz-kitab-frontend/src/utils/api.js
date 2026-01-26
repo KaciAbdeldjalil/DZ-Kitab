@@ -1,17 +1,33 @@
 import axios from 'axios';
 import { getCookie } from './cookies';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+/**
+ * PRODUCTION API CONFIGURATION
+ * This file is the single source of truth for backend communication.
+ * Environment variables are injected at BUILD TIME by Vite.
+ */
 
+const VITE_API_URL = import.meta.env.VITE_API_URL;
+
+// NUCLEAR PROD VALIDATION
+if (!VITE_API_URL || VITE_API_URL.includes("localhost")) {
+    const errorMsg = "CRITICAL ERROR: VITE_API_URL is missing or contains 'localhost'. " +
+                    "Production builds require a valid external API URL. " +
+                    "Value found: " + VITE_API_URL;
+    console.error(errorMsg);
+    throw new Error(errorMsg);
+}
+
+const BASE_URL = VITE_API_URL.replace(/\/$/, "");
 
 const api = axios.create({
-    baseURL: API_BASE_URL,
+    baseURL: BASE_URL,
     headers: {
         'Content-Type': 'application/json',
     },
 });
 
-// Add a request interceptor to include the auth token in all requests
+// AUTH INTERCEPTOR - Injects JWT into every request
 api.interceptors.request.use(
     (config) => {
         const token = getCookie('access_token');
@@ -20,9 +36,7 @@ api.interceptors.request.use(
         }
         return config;
     },
-    (error) => {
-        return Promise.reject(error);
-    }
+    (error) => Promise.reject(error)
 );
 
 export default api;

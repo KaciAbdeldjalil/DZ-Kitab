@@ -41,57 +41,50 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-
 import os
+import re
 from dotenv import load_dotenv
 
-# Charger les variables d'environnement seulement en dveloppement
-if os.getenv("ENVIRONMENT") != "production":
+# Detect Vercel environment
+IS_VERCEL = os.getenv("VERCEL") == "1"
+ENVIRONMENT = os.getenv("ENVIRONMENT", "production" if IS_VERCEL else "development")
+
+# Only load .env if not on Vercel
+if not IS_VERCEL:
     load_dotenv()
 
-# URL de connexion - Priorit absolue  la variable d'environnement
-# URL de connexion - Priorit absolue  la variable d'environnement
+# Priorité absolue à la variable d'environnement DATABASE_URL
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-# Fallback ULTIME pour la production si les variables d'environnement chouent
-if not DATABASE_URL and os.getenv("ENVIRONMENT") == "production":
+# Normalisation pour SQLAlchemy (postgres:// -> postgresql://)
+if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
+# Nettoyage des caractères invisibles
+if DATABASE_URL:
+    DATABASE_URL = re.sub(r'[\x00-\x1F\x7F-\x9F]', '', DATABASE_URL).strip()
+
+# Fallback ULTIME pour la production (Neon DB)
+if not DATABASE_URL and (ENVIRONMENT == "production" or IS_VERCEL):
     DATABASE_URL = "postgresql://neondb_owner:npg_W4JkICUq7Fbr@ep-young-pine-ah3abvjg-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require"
 
-if DATABASE_URL:
-    import re
-    DATABASE_URL = re.sub(r'[\x00-\x1F\x7F-\x9F]', '', DATABASE_URL).strip()
-else:
-    pass # DATABASE_URL IS STILL EMPTY!
-
-# Fallback pour le dveloppement local seulement
+# Fallback pour le développement local (SQLite)
 if not DATABASE_URL:
-    # MySQL connection details (InfinityFree) - Backup defaults
-    DB_USER = "if0_40781999"
-    DB_PASSWORD = "ZElY0rtAdL"
-    DB_NAME = "if0_40781999_dz_kitab"
-    DB_HOST = "sql312.infinityfree.com"
-    DB_PORT = "3306"
-    DATABASE_URL = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    DATABASE_URL = "sqlite:///./dzkitab.db"
 
-print(f"DEBUG: Has DATABASE_URL env var: {bool(os.getenv('DATABASE_URL'))}")
-print(f"DEBUG: Final DATABASE_URL type: {'Postgres' if 'postgres' in DATABASE_URL.lower() else 'Other'}")
-
-
-
-
-# Crer le moteur SQLAlchemy
+# Créer le moteur SQLAlchemy
 if DATABASE_URL.startswith("sqlite"):
     engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 else:
     engine = create_engine(DATABASE_URL, pool_pre_ping=True)
 
-# Crer une session locale
+# Créer une session locale
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# Base pour les modles
+# Base pour les modèles
 Base = declarative_base()
 
-# Dpendance pour obtenir la session DB
+# Dépendance pour obtenir la session DB
 def get_db():
     db = SessionLocal()
     try:

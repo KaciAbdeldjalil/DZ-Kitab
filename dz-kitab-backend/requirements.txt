@@ -20,9 +20,4 @@ pydantic[email]==2.5.0
 
 # Utils
 Pillow
-requests
-beautifulsoup4
-pandas
 python-dotenv
-
-

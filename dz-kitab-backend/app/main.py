@@ -1,13 +1,34 @@
-# app/main.py
+ # app/main.py
 
+import os
+import sys
+from pathlib import Path
+import time
+
+# ===============================
+# Ensure BASE_DIR is in sys.path
+# ===============================
+BASE_DIR = Path(__file__).resolve().parent.parent
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
+
+# ===============================
+# FastAPI Imports
+# ===============================
 from fastapi import FastAPI, Request, Response
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
-import time
-from pathlib import Path
+from fastapi.middleware.cors import CORSMiddleware
 
-from app.core.cors import configure_cors
-from app.database import engine, Base
+from sqlalchemy import text
+from sqlalchemy.exc import IntegrityError, OperationalError
+from jose import JWTError
+
+# ===============================
+# App-specific imports
+# ===============================
+from app.database import engine, Base, SessionLocal
 from app.core.errors import (
     dzkitab_exception_handler,
     validation_exception_handler,
@@ -17,49 +38,37 @@ from app.core.errors import (
     general_exception_handler,
     DZKitabException
 )
-from app.core.logging_config import setup_logging, RequestLoggingMiddleware
 from app.routers import (
-    upload, books, condition, ratings, notifications, auth,
+    books, condition, ratings, notifications, auth,
     wishlist, admin, recommendations, dashboard, messages, curriculum
 )
-from sqlalchemy.exc import IntegrityError, OperationalError
-from jose import JWTError
 
 # ===============================
 # CREATE FASTAPI APP
 # ===============================
 app = FastAPI(
     title="DZ-Kitab API",
-    version="2.1.2",
-    description="API pour la plateforme d'échange de livres universitaires avec système de recommandations par cursus",
+    version="2.1.20",
+    description="API for DZ-Kitab - Production Outage Fix applied",
     docs_url="/docs",
     redoc_url="/redoc"
 )
 
 # ===============================
-# ADD MIDDLEWARES
+# CORS CONFIGURATION
 # ===============================
-app.add_middleware(RequestLoggingMiddleware)
+origins = [
+    "https://dz-kitab-frontend.vercel.app",  # production frontend
+    "http://localhost:3000"                  # optional dev frontend
+]
 
-# ===============================
-# CONFIGURE CORS
-# ===============================
-configure_cors(app)
-
-# ===============================
-# GLOBAL OPTIONS HANDLER (preflight for Vercel)
-# ===============================
-@app.options("/{full_path:path}")
-async def preflight_handler(full_path: str, request: Request):
-    """
-    Handle preflight OPTIONS requests for serverless deployment
-    """
-    response = Response()
-    response.headers["Access-Control-Allow-Origin"] = "https://dz-kitab-frontend.vercel.app"
-    response.headers["Access-Control-Allow-Methods"] = "GET,POST,PUT,DELETE,OPTIONS,PATCH"
-    response.headers["Access-Control-Allow-Headers"] = "Authorization,Content-Type"
-    response.headers["Access-Control-Allow-Credentials"] = "true"
-    return response
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
 # ===============================
 # REGISTER EXCEPTION HANDLERS
@@ -74,14 +83,13 @@ app.add_exception_handler(Exception, general_exception_handler)
 # ===============================
 # STATIC FILES
 # ===============================
-Path("uploads/books").mkdir(parents=True, exist_ok=True)
-app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+if Path("uploads").exists():
+    app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 # ===============================
 # INCLUDE ROUTERS
 # ===============================
 app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
-app.include_router(upload.router, prefix="/api/images", tags=["Images"])
 app.include_router(books.router, prefix="/api/books", tags=["Books & Announcements"])
 app.include_router(condition.router, prefix="/api/condition", tags=["Book Condition"])
 app.include_router(ratings.router, prefix="/api/ratings", tags=["Ratings"])
@@ -94,22 +102,34 @@ app.include_router(messages.router, prefix="/api/messages", tags=["Messages"])
 app.include_router(curriculum.router, prefix="/api/curriculum", tags=["Curriculum"])
 
 # ===============================
-# ROOT ENDPOINTS
+# ROOT & HEALTH ENDPOINTS
 # ===============================
 @app.get("/")
 def read_root():
-    return {"message": "Bienvenue sur DZ-Kitab API!", "version": "2.1.2"}
+    return {
+        "message": "Bienvenue sur DZ-Kitab API!",
+        "version": "2.1.20",
+        "target": "production"
+    }
 
 @app.get("/health")
 def health_check():
-    return {"status": "healthy", "timestamp": time.time()}
+    db_status = "connected"
+    try:
+        db = SessionLocal()
+        db.execute(text("SELECT 1"))
+        db.close()
+    except Exception as e:
+        db_status = f"error: {str(e)}"
+    
+    return {
+        "status": "healthy" if db_status == "connected" else "unhealthy",
+        "database": db_status,
+        "timestamp": time.time(),
+        "version": "2.1.20"
+    }
 
 # ===============================
-# STARTUP
+# STARTUP LOG
 # ===============================
-setup_logging()
-try:
-    Base.metadata.create_all(bind=engine)
-    print("Database tables created successfully!")
-except Exception as e:
-    print(f"Warning: Database init error: {e}")
+print("INFO: Startup complete (v2.1.20).")
