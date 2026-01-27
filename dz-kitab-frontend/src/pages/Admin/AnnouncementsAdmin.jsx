@@ -89,12 +89,18 @@ const AnnouncementsAdmin = () => {
     }
 
     try {
-      await api.delete(`/api/books/announcements/${announcementId}`);
+      await api.delete(`/api/admin/announcements/${announcementId}`);
       setBooks(books.filter((ann) => ann.id !== announcementId));
       alert("Announcement deleted by Admin.");
     } catch (error) {
       console.error("Delete error:", error);
-      alert("Failed to delete announcement.");
+      if (error.response) {
+        console.error("Error status:", error.response.status);
+        console.error("Error data:", error.response.data);
+        alert(`Failed to delete announcement: ${error.response.data?.detail || "Unknown error"}`);
+      } else {
+        alert("Failed to delete announcement.");
+      }
     }
   };
 

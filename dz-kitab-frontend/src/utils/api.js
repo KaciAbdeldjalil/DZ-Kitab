@@ -10,7 +10,7 @@ import { getCookie } from './cookies';
 const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 // NUCLEAR PROD VALIDATION
-if (!VITE_API_URL || VITE_API_URL.includes("localhost")) {
+if (!VITE_API_URL || (import.meta.env.PROD && VITE_API_URL.includes("localhost"))) {
     const errorMsg = "CRITICAL ERROR: VITE_API_URL is missing or contains 'localhost'. " +
                     "Production builds require a valid external API URL. " +
                     "Value found: " + VITE_API_URL;
