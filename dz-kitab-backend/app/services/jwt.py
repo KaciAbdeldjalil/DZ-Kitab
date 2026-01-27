@@ -6,9 +6,10 @@ from typing import Optional
 import os
 
 # Configuration
-SECRET_KEY = os.getenv("JWT_SECRET_KEY", "votre_secret_par_defaut")
+SECRET_KEY = os.getenv("JWT_SECRET_KEY", "2b87beba9e6551eee16f3ffd8b93f683")
 ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30))
+# Default to 30 days (1 month) = 30 * 24 * 60 = 43200 minutes
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 43200))
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     """Crer un token JWT"""
