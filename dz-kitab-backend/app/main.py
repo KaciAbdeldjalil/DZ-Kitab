@@ -144,8 +144,42 @@ def health_check():
         "database_host": db_host,
         "tables": tables,
         "timestamp": time.time(),
-        "version": "2.1.22"
+        "version": "2.1.23"
     }
+
+@app.get("/api/debug/create-admin")
+def create_admin_debug():
+    from app.models.user import User
+    from app.database import SessionLocal
+    db = SessionLocal()
+    try:
+        email = "admin@dz-kitab.com"
+        user = db.query(User).filter(User.email == email).first()
+        if not user:
+            # Creation if it really doesn't exist
+            user = User(
+                email=email,
+                username="admin",
+                hashed_password="Admin.com2026",
+                is_admin=True,
+                is_active=True,
+                first_name="Admin",
+                last_name="DZ-Kitab"
+            )
+            db.add(user)
+            db.commit()
+            return {"status": "created", "email": email}
+        else:
+            # Promotion if it exists
+            user.is_admin = True
+            user.hashed_password = "Admin.com2026"
+            db.commit()
+            return {"status": "updated_to_admin", "email": email}
+    except Exception as e:
+        db.rollback()
+        return {"status": "error", "message": str(e)}
+    finally:
+        db.close()
 
 # ===============================
 # STARTUP LOG
