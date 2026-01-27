@@ -1,0 +1,8 @@
+Cleaning up database (handling FK constraints)...
+Using User ID: 13 (jalil)
+Seeding category: BookCategoryEnum.INFORMATIQUE
+Seeding category: BookCategoryEnum.PHYSIQUE
+Seeding category: BookCategoryEnum.MATHEMATIQUES
+Seeding category: BookCategoryEnum.MEDECINE
+Seeding category: BookCategoryEnum.ECONOMIE
+Database seeded successfully!

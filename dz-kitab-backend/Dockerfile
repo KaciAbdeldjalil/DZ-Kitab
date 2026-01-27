@@ -11,5 +11,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copier le reste de l'application
 COPY . .
 
-# Commande par défaut
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+# Commande par daut
+# Railway use dynamic port, so we use shell format or a script
+CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8080}
