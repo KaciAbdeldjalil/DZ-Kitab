@@ -1,0 +1,3 @@
+# This file is for Railway to understand the monorepo structure.
+# However, Railway usually manages this via the UI.
+# If you are using one service for the whole repo, you should set the "Root Directory" to dz-kitab-backend or dz-kitab-frontend.
