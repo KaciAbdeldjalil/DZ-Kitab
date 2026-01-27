@@ -364,7 +364,7 @@ def delete_user(
     db: Session = Depends(get_db),
     admin: User = Depends(get_current_admin)
 ):
-    """Delete a user (soft delete by blocking)"""
+    """Delete a user COMPLETELY from database (Hard Delete)"""
     try:
         user = db.query(User).filter(User.id == user_id).first()
         
@@ -380,12 +380,12 @@ def delete_user(
                 detail="Vous ne pouvez pas supprimer votre propre compte"
             )
         
-        # Soft delete - just block the user
-        user.is_active = False
+        # Hard delete - remove from database
+        db.delete(user)
         db.commit()
         
         return {
-            "message": f"Utilisateur {user.username} supprim avec succs",
+            "message": f"Utilisateur {user.username} (ID: {user_id}) a t dfinitivement supprim de la base de donnes.",
             "user_id": user_id
         }
         
@@ -396,7 +396,7 @@ def delete_user(
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Erreur lors de la suppression de l'utilisateur"
+            detail=f"Erreur lors de la suppression de l'utilisateur: {str(e)}"
         )
 
 # ============================================
