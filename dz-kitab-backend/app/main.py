@@ -64,7 +64,7 @@ origins = [
     "http://localhost:3000",                 # optional dev frontend
     "http://localhost:5173",                 # Vite default
     "http://127.0.0.1:5173",                 # Vite default (IP)
-    "https://dz-kitab-frontend1-production.up.railway.app",
+    "https://dz-kitab-frontend-production.up.railway.app",
 ]
 
 app.add_middleware(
