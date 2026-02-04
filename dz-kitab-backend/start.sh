@@ -8,7 +8,7 @@ echo "Starting backend on port $PORT..."
 
 # Ensure schema exists (Automatic migration equivalent)
 echo "Syncing database schema..."
-python -c "from app.database import engine, Base; from app.models.user import User; from app.models.book import Book, Announcement; Base.metadata.create_all(bind=engine)"
+python -c "from app.database import engine, Base; import app.models; Base.metadata.create_all(bind=engine)"
 
 # Start Gunicorn with Uvicorn workers
 exec gunicorn app.main:app \
